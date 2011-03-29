@@ -1,10 +1,38 @@
-directory "../build"
+$build_dir = '../build/'
+$tests_dir = 'test/'
 
-desc "Builds the project."
-task :build => "../build" do 
-  puts "Building..."
+$cc = 'gcc'
+$cf = '-Wall'
+$srcs = FileList['*.c']
+$objs = $srcs.map{ |s| s.sub('.c', '.o') }
+$exec = 'splines'
+$test_srcs = FileList[$tests_dir + '*.c']
+$test_objs = $test_srcs.map{ |s| s.sub('.c', '.o') }
+$test_exec = 'test_splines'
+
+rule '.o' => '.c' do |t|
+  sh "#{$cc} #{$cf} #{t.source} -c -o #{t.name}"
 end
 
-task :test => :build do
-  puts "Testing..."
+directory $build_dir
+
+file $exec => $objs do |t|
+  sh "#{$cc} #{$cf} #{t.prerequisites.join(' ')} -o #{t.name}"
+end
+
+file $test_exec => [$objs, $test_objs].flatten do |t|
+  sh "#{$cc} #{$cf} #{t.prerequisites.join(' ')} -o #{t.name}"
+end
+
+task :default => :build
+
+desc "Builds the project"
+task :build => [$build_dir, $exec] do |t|
+  mv $exec, $build_dir
+end
+
+desc "Run all tests"
+task :test => [$build_dir, $test_exec] do
+  mv $test_exec, $build_dir
+  sh "./#{$build_dir + $test_exec}"
 end
