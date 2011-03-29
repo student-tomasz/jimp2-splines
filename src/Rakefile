@@ -31,6 +31,11 @@ task :build => [$build_dir, $exec] do |t|
   mv $exec, $build_dir
 end
 
+desc "Removes all build products"
+task :clean do |t|
+  rm_r [$objs, $test_objs, $build_dir].flatten
+end
+
 desc "Run all tests"
 task :test => [$build_dir, $test_exec] do
   mv $test_exec, $build_dir
