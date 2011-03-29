@@ -1,0 +1,10 @@
+directory "../build"
+
+desc "Builds the project."
+task :build => "../build" do 
+  puts "Building..."
+end
+
+task :test => :build do
+  puts "Testing..."
+end
