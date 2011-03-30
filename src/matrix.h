@@ -1,6 +1,8 @@
 #ifndef _MATRIX_H
 #define _MATRIX_H
 
+#define EPSILON 1e-12
+
 typedef struct matrix_s {
   double *t;
   int r;
