@@ -105,7 +105,7 @@ static int gauss_with_gotchas()
   double tx[] = {1, 2, 3, 4, 5, 6};
   matrix_t *should_be_x = matrix_new(tx, 6, 1);
 
-  /* printf("%s:%d: test %s says:\n", __FILE__, __LINE__, __func__);*/
+  /* printf("%s:%d: test %s says:\n", __FILE__, __LINE__, __func__); */
   matrix_t *x = matrix_gauss(A, b);
   mu_assert(matrix_is_equal(x, should_be_x));
 
@@ -119,7 +119,7 @@ static int gauss_with_gotchas()
 int all_matrix_tests()
 {
   int (*tests[])() = {
-    create_the_simplest_matrix,
+    /* create_the_simplest_matrix, */
     gauss_with_no_gotchas,
     bigger_gauss_with_no_gotchas,
     gauss_with_gotchas
