@@ -33,7 +33,7 @@ end
 
 desc "Removes all build products"
 task :clean do |t|
-  rm_r [$objs, $test_objs, $build_dir].flatten
+  rm_r [$objs, $test_objs, $build_dir].flatten rescue nil
 end
 
 desc "Run all tests"
