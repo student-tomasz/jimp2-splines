@@ -30,18 +30,6 @@ static void polynomial_print(polynomial_t *p)
   printf("\n");
 }
 
-static int create_simple_polynomial()
-{
-  double c[] = {3, 2, 1, 1};
-  polynomial_t *p = polynomial_new(c, 3);
-
-  polynomial_print(p);
-  mu_assert(1);
-
-  polynomial_free(p);
-  return 0;
-}
-
 static int derivate_simple_polynomial()
 {
   double c[] = {3, 2, 1, -1};
@@ -62,7 +50,6 @@ static int derivate_simple_polynomial()
 int all_polynomial_tests()
 {
   int (*tests[])() = {
-    /* create_simple_polynomial, */
     derivate_simple_polynomial
   };
 
