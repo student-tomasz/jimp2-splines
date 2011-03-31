@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "epsilon.h"
 #include "matrix.h"
 
 static int matrix_find_max_in_column(matrix_t *A, int i);
