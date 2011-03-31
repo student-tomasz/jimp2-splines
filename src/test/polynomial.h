@@ -5,5 +5,3 @@ int all_polynomial_tests();
 
 #endif /* _TEST_POLYNOMIAL_H */
 
-
-

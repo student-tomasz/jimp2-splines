@@ -3,33 +3,6 @@
 #include "../epsilon.h"
 #include "../polynomial.h"
 
-static int polynomial_is_equal(polynomial_t *lh, polynomial_t *rh) {
-  if (lh->d != rh->d) {
-    return 0;
-  }
-  int i;
-  for (i = 0; i < lh->d; ++i) {
-    if (fabs(lh->c[i] - rh->c[i]) > EPSILON) {
-      return 0;
-    }
-  }
-
-  return 1;
-}
-
-static void polynomial_print(polynomial_t *p)
-{
-  int i;
-  for (i = p->d; i >= 0; --i) {
-    printf("%g", p->c[i]);
-    printf("*x**%d", i);
-    if (i != 0) {
-      printf(" + ");
-    }
-  }
-  printf("\n");
-}
-
 static int derivate_simple_polynomial()
 {
   double c[] = {3, 2, 1, -1};
