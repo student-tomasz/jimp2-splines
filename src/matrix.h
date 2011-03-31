@@ -10,6 +10,7 @@ typedef struct matrix_s {
 matrix_t *matrix_new(double *t, int r, int c);
 void matrix_free(matrix_t *m);
 matrix_t *matrix_gauss(matrix_t *A, matrix_t *b);
+void matrix_print(matrix_t *m);
 
 #endif // _MATRIX_H
 

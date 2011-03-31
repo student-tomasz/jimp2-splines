@@ -17,40 +17,6 @@ static int matrix_is_equal(matrix_t *lh, matrix_t *rh) {
   return 1;
 }
 
-static void matrix_print(matrix_t *A)
-{
-  printf("[");
-  int i, j;
-  for (i = 0; i < A->r; ++i) {
-    printf("[");
-    for (j = 0; j < A->c; ++j) {
-      double a = A->t[i*A->c+j];
-      if (j != A->c-1)
-        printf("%g, ", a);
-      else
-        printf("%g", a);
-    }
-    if (i != A->r-1)
-      printf("],");
-    else
-     printf("]");
-  }
-  printf("]\n");
-}
-
-static int create_the_simplest_matrix()
-{
-  double t[] = {1.1, 2.2, 3.3, 4.4};
-  matrix_t *m = matrix_new(t, 2, 2);
-
-  printf("%s:%d: test %s says:\n", __FILE__, __LINE__, __func__);
-  matrix_print(m);
-
-  matrix_free(m);
-  mu_assert(1);
-  return 0;
-}
-
 static int gauss_with_no_gotchas()
 {
   double ta[] = {2, 1, 3, -2};

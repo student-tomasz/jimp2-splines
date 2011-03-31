@@ -69,6 +69,24 @@ matrix_t *matrix_gauss(matrix_t *A, matrix_t *b)
   return x;
 }
 
+void matrix_print(matrix_t *A)
+{
+  printf("[");
+  int i, j;
+  for (i = 0; i < A->r; ++i) {
+    printf("[");
+    for (j = 0; j < A->c; ++j) {
+      double a = A->t[i*A->c+j];
+      if (j != A->c-1)
+        printf("%g, ", a);
+      else
+        printf("%g", a);
+    }
+    printf("]%s", i == A->r-1 ? "" : ",\n");
+  }
+  printf("]\n");
+}
+
 static int matrix_find_max_in_column(matrix_t *A, int i)
 {
   int max_i = i;
@@ -115,3 +133,4 @@ static int matrix_is_square(matrix_t *A)
 {
   return (A->r == A->c) && (A->c > 0);
 }
+
