@@ -13,18 +13,14 @@ static int matrix_is_square(matrix_t *A);
 matrix_t *matrix_new(double *t, int r, int c)
 {
   matrix_t *m = malloc(sizeof(*m));
-  m->t = malloc(sizeof(*(m->t)) * r * c);
+  m->t = malloc(sizeof(*(m->t)) * r*c);
   m->r = r;
   m->c = c;
-
-  if (!t) {
-    return m;
-  }
 
   int i, j;
   for (i = 0; i < r; ++i) {
     for (j = 0; j < c; ++j) {
-      m->t[i*c+j] = t[i*c+j];
+      m->t[i*c+j] = t ? t[i*c+j] : 0;
     }
   }
   return m;
