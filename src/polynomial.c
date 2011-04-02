@@ -29,19 +29,6 @@ void polynomial_free(polynomial_t *p) {
   }
 }
 
-polynomial_t *polynomial_derivate(polynomial_t *p)
-{
-  int d = p->d-1;
-  double *c = malloc(sizeof(*c) * d);
-
-  int i;
-  for (i = d; i >= 0; --i) {
-    c[i] = p->c[i+1]*(i+1);
-  }
-
-  return polynomial_new(c, d);
-}
-
 int polynomial_is_equal(polynomial_t *lp, polynomial_t *rp) {
   if (lp->d != rp->d) {
     return 0;

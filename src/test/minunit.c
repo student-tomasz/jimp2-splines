@@ -1,6 +1,5 @@
 #include "minunit.h"
 #include "matrix.h"
-#include "polynomial.h"
 #include "spline.h"
 #include "io.h"
 
@@ -10,7 +9,6 @@ int main(int argc, char **argv)
 {
     int (*test_suites[])() = {
         all_matrix_tests,
-        all_polynomial_tests,
         all_spline_tests,
         all_io_tests
     };
