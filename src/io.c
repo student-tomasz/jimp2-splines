@@ -1,10 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include "io.h"
 #include "point.h"
 #include "list.h"
 #include "point_list.h"
+#include "polynomial.h"
 
 list_t *io_read(const char *source_file)
 {
@@ -46,5 +48,32 @@ list_t *io_read(const char *source_file)
   fclose(source);
 
   return points; // TODO: log
+}
+
+int io_write(const char* output_file, list_t *nodes, list_t *splines)
+{
+  FILE *output = fopen(output_file, "w");
+
+  time_t rawtime;
+  time(&rawtime);
+  fprintf(output, "# created at: %s", ctime(&rawtime));
+  fprintf(output, "#       file: %s\n", output_file);
+  fprintf(output, "# [x=x_{n1}:x_{n2}] fun_n(x) =  a_{n0} + a_{n1}*x + a_{n2}*x**2 + a_{n3}*x**3\n");
+
+  list_t *spline = splines;
+  list_t *node = nodes;
+  int i = 0;
+  for(spline = splines, node = nodes; spline && node; spline = spline->next, node = node->next) {
+    char *p_str = polynomial_to_str((polynomial_t *)spline->data);
+    fprintf(output, "[x=%lg:%lg] fun%d(x) = %s\n",
+        ((point_t *)node->data)->x,
+        ((point_t *)node->next->data)->x,
+        i++,
+        p_str);
+    free(p_str);
+  }
+
+  fclose(output);
+  return 1;
 }
 

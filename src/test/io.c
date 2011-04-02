@@ -6,6 +6,8 @@
 #include "../point.h"
 #include "../list.h"
 #include "../point_list.h"
+#include "../spline.h"
+#include "../polynomial.h"
 
 static int read_correct_file()
 {
@@ -34,7 +36,6 @@ static int read_correct_file()
   }
 
   mu_assert(1);
-  return 0;
 }
 
 static int read_correct_file_with_poor_formating()
@@ -99,7 +100,30 @@ static int read_correct_file_with_poor_formating_and_duplicate_points()
   }
 
   mu_assert(1);
-  return 0;
+}
+
+static int write_correct_file()
+{
+  const char *source_file = "correct_source_file.dat";
+  FILE *source = fopen(source_file, "w");
+
+  int i, m = 2;
+  point_t **should_be_nodes = malloc(sizeof(*should_be_nodes) * (m+1));
+  should_be_nodes[0] = point_new(1, 2);
+  should_be_nodes[1] = point_new(3, 3.5);
+  should_be_nodes[2] = point_new(5, 3.7);
+  for (i = 0; i < m+1; ++i) {
+    fprintf(source, "%lg %lg\n", should_be_nodes[i]->x, should_be_nodes[i]->y);
+  }
+  fclose(source);
+  
+  list_t *nodes = io_read(source_file);
+  list_t *splines = spline_interpolate(nodes);
+
+  const char* output_file = "correct_source_file.out";
+  io_write(output_file, nodes, splines);
+
+  mu_assert(1);
 }
 
 int all_io_tests()
@@ -107,7 +131,8 @@ int all_io_tests()
   int (*tests[])() = {
     read_correct_file,
     read_correct_file_with_poor_formating,
-    read_correct_file_with_poor_formating_and_duplicate_points
+    read_correct_file_with_poor_formating_and_duplicate_points,
+    write_correct_file
   };
 
   int i;
