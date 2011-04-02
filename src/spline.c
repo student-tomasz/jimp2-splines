@@ -76,6 +76,13 @@ list_t *spline_interpolate(list_t *nodes)
     double coeffs[] = { k->t[i*d + 0], k->t[i*d + 1], k->t[i*d + 2], k->t[i*d + 3] };
     splines = list_add(splines, polynomial_new(coeffs, 3));
   }
+
+  matrix_free(b);
+  matrix_free(k);
+  matrix_free(A);
+  free(y);
+  free(x);
+
   return splines;
 }
 
