@@ -49,7 +49,7 @@ int polynomial_is_equal(polynomial_t *lp, polynomial_t *rp) {
 
   int i;
   for (i = 0; i < lp->d; ++i) {
-    if (fabs(lp->c[i] - rp->c[i]) > EPSILON) {
+    if (!is_equal(lp->c[i], rp->c[i])) {
       return 0;
     }
   }
