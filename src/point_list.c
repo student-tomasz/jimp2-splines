@@ -25,10 +25,15 @@ list_t *point_list_cleanup(point_t **points_array, int points_count)
   qsort(points_array, points_count, sizeof(*points_array), point_list_compare);
 
   list_t *points = NULL;
+  point_t *curr_p = NULL;
+  point_t *last_p = NULL;
   int i;
   for (i = 0; i < points_count; ++i) {
-    point_t *p = points_array[i];
-    points = list_add(points, point_new(p->x, p->y));
+    curr_p = points_array[i];
+    if (curr_p && last_p && is_equal(curr_p->x, last_p->x))
+      continue;
+    points = list_add(points, point_new(curr_p->x, curr_p->y));
+    last_p = curr_p;
   }
 
   return points;
@@ -41,7 +46,7 @@ char *point_list_to_str(list_t *head)
   char *tmp = malloc(sizeof(*tmp) * (MAX_STR_LENGTH + 1));
 
   list_t *node = NULL;
-  for (node = head; node; node = node->next) {
+  for (node = head; node != NULL; node = node->next) {
     sprintf(tmp, "%s", point_to_str((point_t *)node->data));
     strcat(str, tmp);
   }
