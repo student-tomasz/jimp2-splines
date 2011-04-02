@@ -6,7 +6,7 @@
 #include "matrix.h"
 #include "spline.h"
 
-polynomial_t **spline_interpolate(list_t *nodes)
+list_t *spline_interpolate(list_t *nodes)
 {
   int m = list_length(nodes)-1;
   int d = 4;
@@ -71,11 +71,11 @@ polynomial_t **spline_interpolate(list_t *nodes)
   k = matrix_gauss(A, b);
 
   /* get all the polynomials */
-  polynomial_t **splines = malloc(sizeof(*splines) * m);
+  list_t *splines = NULL;
   for (i = 0; i < m; ++i) {
     double coeffs[] = { k->t[i*d + 0], k->t[i*d + 1], k->t[i*d + 2], k->t[i*d + 3] };
-    splines[i] = polynomial_new(coeffs, 3);
+    splines = list_add(splines, polynomial_new(coeffs, 3));
   }
-
   return splines;
 }
+

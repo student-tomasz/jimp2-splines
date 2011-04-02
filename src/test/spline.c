@@ -12,7 +12,7 @@ static int basic_spline()
   list_add(nodes, point_new(3, 3.5));
   list_add(nodes, point_new(5, 3.7));
 
-  polynomial_t **splines = spline_interpolate(nodes);
+  list_t *splines = spline_interpolate(nodes);
 
   polynomial_t **should_be_splines = malloc(sizeof(*should_be_splines) * m);
   double c0[] = { 1.128125, 0.790625, 0.121875, -0.040625 };
@@ -22,8 +22,9 @@ static int basic_spline()
 
   int result = 1;
   int i;
-  for (i = 0; i < m; ++i) {
-    if (!polynomial_is_equal(splines[i], should_be_splines[i]))
+  list_t *spline = NULL;
+  for (i = 0, spline = splines; i < m; ++i, spline = spline->next) {
+    if (!polynomial_is_equal((polynomial_t *)spline->data, should_be_splines[i]))
       result = 0;
   }
 

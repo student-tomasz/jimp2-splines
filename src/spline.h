@@ -5,7 +5,7 @@
 #include "list.h"
 #include "polynomial.h"
 
-polynomial_t **spline_interpolate(list_t *nodes);
+list_t *spline_interpolate(list_t *nodes);
 
 #endif /* _SPLINE_H */
 
