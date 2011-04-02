@@ -28,7 +28,39 @@ static int read_correct_file()
   for (node = nodes, i = 0; i < m+1; node = node->next, ++i) {
     /* printf("lol: %s == %s\n", point_to_str((point_t *)node->data), point_to_str(should_be_nodes[i]));*/
     if (!point_is_equal((point_t *)node->data, should_be_nodes[i]))
-      return 1;
+      mu_assert(0);
+  }
+
+  mu_assert(1);
+  return 0;
+}
+
+static int read_correct_file_with_poor_formating()
+{
+  const char *file = "correct_file_with_poor_formating.dat";
+  FILE *source = fopen(file, "w");
+
+  int i, m = 2;
+  point_t **should_be_nodes = malloc(sizeof(*should_be_nodes) * (m+1));
+  should_be_nodes[0] = point_new(1, 2);
+  should_be_nodes[1] = point_new(3, 3.5);
+  should_be_nodes[2] = point_new(5, 3.7);
+
+  fprintf(source, " %lg %lg\n", should_be_nodes[0]->x, should_be_nodes[0]->y);
+  fprintf(source, "%lg  %lg\t", should_be_nodes[2]->x, should_be_nodes[2]->y);
+  fprintf(source, "\t%lg %lg", should_be_nodes[1]->x, should_be_nodes[1]->y);
+
+  fclose(source);
+  
+  list_t *nodes = io_read(file);
+  list_t *node;
+  if (!nodes) {
+    return 1;
+  }
+  for (node = nodes, i = 0; i < m+1; node = node->next, ++i) {
+    /* printf("lol: %s == %s\n", point_to_str((point_t *)node->data), point_to_str(should_be_nodes[i]));*/
+    if (!point_is_equal((point_t *)node->data, should_be_nodes[i]))
+      mu_assert(0);
   }
 
   mu_assert(1);
@@ -38,7 +70,8 @@ static int read_correct_file()
 int all_io_tests()
 {
   int (*tests[])() = {
-    read_correct_file
+    read_correct_file,
+    read_correct_file_with_poor_formating
   };
 
   int i;
