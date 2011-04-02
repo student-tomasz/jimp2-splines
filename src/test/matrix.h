@@ -5,4 +5,3 @@ int all_matrix_tests();
 
 #endif /* _TEST_MATRIX_H */
 
-
