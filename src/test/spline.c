@@ -1,16 +1,16 @@
 #include <stdlib.h>
 #include "minunit.h"
 #include "spline.h"
+#include "../list.h"
 #include "../point.h"
-#include "../point_list.h"
 #include "../spline.h"
 
 static int basic_spline()
 {
   int m = 2;
-  point_list_t *nodes = point_list_add(NULL, point_new(1, 2));
-  point_list_add(nodes, point_new(3, 3.5));
-  point_list_add(nodes, point_new(5, 3.7));
+  list_t *nodes = list_add(NULL, point_new(1, 2));
+  list_add(nodes, point_new(3, 3.5));
+  list_add(nodes, point_new(5, 3.7));
 
   polynomial_t **splines = spline_interpolate(nodes);
 

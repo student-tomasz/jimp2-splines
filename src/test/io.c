@@ -4,7 +4,6 @@
 #include "io.h"
 #include "../io.h"
 #include "../point.h"
-#include "../point_list.h"
 
 static int read_correct_file()
 {
@@ -21,14 +20,14 @@ static int read_correct_file()
   }
   fclose(source);
   
-  point_list_t *nodes = io_read(file);
-  point_list_t *node;
+  list_t *nodes = io_read(file);
+  list_t *node;
   if (!nodes) {
     return 1;
   }
   for (node = nodes, i = 0; i < m+1; node = node->next, ++i) {
-    /* printf("lol: %s == %s\n", point_to_str(node->point), point_to_str(should_be_nodes[i]));*/
-    if (!point_is_equal(node->point, should_be_nodes[i]))
+    /* printf("lol: %s == %s\n", point_to_str((point_t *)node->data), point_to_str(should_be_nodes[i]));*/
+    if (!point_is_equal((point_t *)node->data, should_be_nodes[i]))
       return 1;
   }
 

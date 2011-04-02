@@ -2,10 +2,10 @@
 #define _SPLINE_H
 
 #include "point.h"
-#include "point_list.h"
+#include "list.h"
 #include "polynomial.h"
 
-polynomial_t **spline_interpolate(point_list_t *nodes);
+polynomial_t **spline_interpolate(list_t *nodes);
 
 #endif /* _SPLINE_H */
 
