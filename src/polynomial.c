@@ -61,8 +61,8 @@ char *polynomial_to_str(polynomial_t *p)
 {
   char *str = malloc(sizeof(*str) * (MAX_STR_LENGTH + 1));
   char *tmp = malloc(sizeof(*tmp) * (MAX_STR_LENGTH + 1));
-  str[0] = '\0';
 
+  str[0] = '\0';
   int i;
   for (i = 0; i <= p->d; ++i) {
     sprintf(tmp, "%10.10g", p->c[i]);
@@ -85,6 +85,7 @@ char *polynomial_to_str(polynomial_t *p)
     }
   }
 
+  free(tmp);
   return str;
 }
 
