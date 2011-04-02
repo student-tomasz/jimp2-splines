@@ -1,13 +1,14 @@
 #include <stdlib.h>
 #include <math.h>
 #include "point.h"
+#include "point_list.h"
 #include "polynomial.h"
 #include "matrix.h"
 #include "spline.h"
 
-polynomial_t **spline_interpolate(point_t **nodes, int nodes_count)
+polynomial_t **spline_interpolate(point_list_t *nodes)
 {
-  int m = nodes_count-1;
+  int m = point_list_length(nodes)-1;
   int d = 4;
   int i, j, l;
 
@@ -21,9 +22,10 @@ polynomial_t **spline_interpolate(point_t **nodes, int nodes_count)
   matrix_t *b = matrix_new(NULL, d*m, 1);
 
   /* fill helpers */
-  for (i = 0; i <= m; ++i) {
-    x[i] = nodes[i]->x;
-    y[i] = nodes[i]->y;
+  point_list_t *node;
+  for (node = nodes, i = 0; node != NULL; node = node->next, ++i) {
+    x[i] = node->point->x;
+    y[i] = node->point->y;
   }
 
   /* fill matrix A with values of polynomials */

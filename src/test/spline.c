@@ -2,17 +2,17 @@
 #include "minunit.h"
 #include "spline.h"
 #include "../point.h"
+#include "../point_list.h"
 #include "../spline.h"
 
 static int basic_spline()
 {
   int m = 2;
-  point_t **nodes = malloc(sizeof(*nodes) * (m+1));
-  nodes[0] = point_new(1, 2);
-  nodes[1] = point_new(3, 3.5);
-  nodes[2] = point_new(5, 3.7);
+  point_list_t *nodes = point_list_add(NULL, point_new(1, 2));
+  point_list_add(nodes, point_new(3, 3.5));
+  point_list_add(nodes, point_new(5, 3.7));
 
-  polynomial_t **splines = spline_interpolate(nodes, m+1);
+  polynomial_t **splines = spline_interpolate(nodes);
 
   polynomial_t **should_be_splines = malloc(sizeof(*should_be_splines) * m);
   double c0[] = { 1.128125, 0.790625, 0.121875, -0.040625 };
