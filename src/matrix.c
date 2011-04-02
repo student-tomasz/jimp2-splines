@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
+#include "io.h"
 #include "epsilon.h"
 #include "matrix.h"
 
@@ -69,22 +71,34 @@ matrix_t *matrix_gauss(matrix_t *A, matrix_t *b)
   return x;
 }
 
-void matrix_print(matrix_t *A)
+char *matrix_to_str(matrix_t *m)
 {
-  printf("[");
+  char *str = malloc(sizeof(*str) * (MAX_STR_LENGTH * 10 + 1));
+  str[0] = '\0';
+  char *tmp = malloc(sizeof(*tmp) * (MAX_STR_LENGTH + 1));
+
+  sprintf(tmp, "[");
+  strcat(str, tmp);
   int i, j;
-  for (i = 0; i < A->r; ++i) {
-    printf("[");
-    for (j = 0; j < A->c; ++j) {
-      double a = A->t[i*A->c+j];
-      if (j != A->c-1)
-        printf("%g, ", a);
+  for (i = 0; i < m->r; ++i) {
+    sprintf(tmp, "[");
+    strcat(str, tmp);
+    for (j = 0; j < m->c; ++j) {
+      double v = m->t[i*m->c+j];
+      if (j != m->c-1)
+        sprintf(tmp, "%g, ", v);
       else
-        printf("%g", a);
+        sprintf(tmp, "%g", v);
+      strcat(str, tmp);
     }
-    printf("]%s", i == A->r-1 ? "" : ",\n");
+    sprintf(tmp, "]%s", i == m->r-1 ? "" : ",\n");
+    strcat(str, tmp);
   }
-  printf("]\n");
+  sprintf(tmp, "]\n");
+  strcat(str, tmp);
+
+  free(tmp);
+  return str;
 }
 
 static int matrix_find_max_in_column(matrix_t *A, int i)

@@ -46,8 +46,15 @@ static int bigger_gauss_with_no_gotchas()
   matrix_t *should_be_x = matrix_new(tx, 3, 1);
 
   /* printf("%s:%d: test %s says:\n", __FILE__, __LINE__, __func__);*/
+
+  printf("%s:%d: test %s says:\n", __FILE__, __LINE__, __func__);
+  printf("matrix A:\n%s\n", matrix_to_str(A));
+  printf("matrix b:\n%s\n", matrix_to_str(b));
+
   matrix_t *x = matrix_gauss(A, b);
   mu_assert(matrix_is_equal(x, should_be_x));
+
+  printf("after gauss matrix x:\n%s\n", matrix_to_str(x));
 
   matrix_free(x);
   matrix_free(should_be_x);
