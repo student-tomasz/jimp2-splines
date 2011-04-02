@@ -47,7 +47,7 @@ matrix_t *matrix_gauss(matrix_t *A, matrix_t *b)
   int i, j;
   for (i = 0; i < n; ++i) {
     int max_i = matrix_find_max_in_column(A, i);
-    if (fabs(A->t[max_i*n+i]) < EPSILON) {
+    if (is_zero(A->t[max_i*n+i])) {
       return NULL; // TODO: error
     }
     matrix_swap_rows(A, i, max_i);
