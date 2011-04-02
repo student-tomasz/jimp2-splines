@@ -20,3 +20,15 @@ point_list_t *point_list_add(point_list_t *head, point_t *point)
   return head;
 }
 
+int point_list_length(point_list_t *head)
+{
+  point_list_t *node = head;
+  int length = 0;
+
+  for (node = head; node != NULL; node = node->next) {
+    ++length;
+  }
+
+  return length;
+}
+

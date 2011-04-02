@@ -9,6 +9,7 @@ typedef struct point_list_s {
 } point_list_t;
 
 point_list_t *point_list_add(point_list_t *head, point_t *point);
+int point_list_length(point_list_t *head);
 
 #endif
 
