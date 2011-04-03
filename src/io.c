@@ -64,16 +64,74 @@ int io_write(const char* output_file, list_t *nodes, list_t *splines)
   list_t *node = nodes;
   int i = 0;
   for(spline = splines, node = nodes; spline && node; spline = spline->next, node = node->next) {
-    char *p_str = polynomial_to_str((polynomial_t *)spline->data);
+    char *poly_str = polynomial_to_str((polynomial_t *)spline->data);
     fprintf(output, "[x=%lg:%lg] fun%d(x) = %s\n",
         ((point_t *)node->data)->x,
         ((point_t *)node->next->data)->x,
         i++,
-        p_str);
-    free(p_str);
+        poly_str);
+    free(poly_str);
   }
 
   fclose(output);
+  return 1;
+}
+
+int io_gnuplot(const char* gnuplot_file, list_t *nodes, list_t *splines)
+{
+  FILE *gnuplot = fopen(gnuplot_file, "w");
+  char *plot_file = malloc(sizeof(*plot_file) * (strlen(gnuplot_file)+1));
+  strcpy(plot_file, gnuplot_file);
+  strcpy(plot_file+strlen(gnuplot_file)-3, "png");
+
+  time_t rawtime;
+  time(&rawtime);
+  fprintf(gnuplot, "# created at: %s", ctime(&rawtime));
+  fprintf(gnuplot, "#       file: %s\n", gnuplot_file);
+  fprintf(gnuplot, "set term png size 800, 600\n");
+  fprintf(gnuplot, "set output \"%s\"\n", plot_file);
+  fprintf(gnuplot, "set nokey\n");
+  fprintf(gnuplot, "set notitle\n");
+  fprintf(gnuplot, "set grid\n");
+  fprintf(gnuplot, "\n");
+  fprintf(gnuplot, "set parametric\n");
+  fprintf(gnuplot, "\n");
+
+  list_t *spline = splines;
+  list_t *node = nodes;
+  
+  int i;
+  for (node = nodes, i = 0; node != NULL; node = node->next, ++i) {
+    point_t *p = (point_t *)node->data;
+    fprintf(gnuplot, "x%d = %lg; y%d = %lg;\n", i, p->x, i, p->y);
+  }
+  fprintf(gnuplot, "\n");
+
+  for (i = 0; i < list_length(nodes); ++i) {
+    fprintf(gnuplot, "x%d(t) = x%d+(x%d-x%d)*t;\n", i, i, i+1, i);
+  }
+  fprintf(gnuplot, "\n");
+
+  for (spline = splines, i = 0; spline != NULL; spline = spline->next, ++i) {
+    char *poly_str = polynomial_to_str((polynomial_t *)spline->data);
+    fprintf(gnuplot, "fun%d(x) = %s\n", i, poly_str);
+    free(poly_str);
+  }
+  fprintf(gnuplot, "\n");
+
+  fprintf(gnuplot, "plot [t=0:1]\\\n");
+  for (i = 0; i < list_length(splines); ++i) {
+    fprintf(gnuplot, "\tx%d(t), fun%d(x%d(t)),\\\n", i, i, i);
+  }
+  fprintf(gnuplot, "\t\"-\" with points\n");
+  for (node = nodes; node != NULL; node = node->next) {
+    point_t *p = (point_t *)node->data;
+    fprintf(gnuplot, "\t\t%lg %lg\n", p->x, p->y);
+  }
+  fprintf(gnuplot, "\te\n");
+ 
+  fclose(gnuplot);
+  free(plot_file);
   return 1;
 }
 

@@ -122,6 +122,8 @@ static int write_correct_file()
 
   const char* output_file = "correct_source_file.out";
   io_write(output_file, nodes, splines);
+  const char* gnuplot_file = "correct_source_file.plt";
+  io_gnuplot(gnuplot_file, nodes, splines);
 
   mu_assert(1);
 }
