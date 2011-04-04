@@ -18,19 +18,28 @@ static char *io_change_filename_extension(const char *filename, const char *exte
 list_t *io_read()
 {
   FILE *source = NULL;
-  if (options->in_filename)
+  if (options->in_filename) {
     source = fopen(options->in_filename, "r");
-  else
+    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+strlen(options->in_filename)+1));
+    sprintf(msg, "reading data from file: %s", options->in_filename);
+    io_log(msg);
+    free(msg);
+  }
+  else {
     source = stdin;
+    io_log("reading data from standard input");
+  }
 
   if (!source) {
-    return NULL; // TODO: error
+    io_error("couldn't read data");
+    return NULL;
   }
 
   int points_array_size = 8;
   int points_count = 0;
   point_t **points_array = malloc(sizeof(*points_array) * points_array_size);
 
+  int read_sum = 0;
   while (1) {
     double x, y;
     int read_count = fscanf(source, "%lg %lg", &x, &y);
@@ -40,13 +49,19 @@ list_t *io_read()
         points_array_size *= 2;
         points_array = realloc(points_array, sizeof(*points_array) * points_array_size);
       }
+      read_sum += 1;
     }
     else if (read_count == EOF) {
-      break; // TODO: log
+      char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
+      sprintf(msg, "read %d points", read_sum);
+      io_log(msg);
+      free(msg);
+      break;
     }
     else {
       if (source != stdin) fclose(source);
-      return NULL; // TODO: error
+      io_error("couldn't read data");
+      return NULL;
     }
   }
 
@@ -59,7 +74,7 @@ list_t *io_read()
   free(points_array);
   if (source != stdin) fclose(source);
 
-  return points; // TODO: log
+  return points;
 }
 
 
@@ -77,7 +92,11 @@ int io_write(list_t *nodes, list_t *splines)
   FILE *output = fopen(output_filename, "r");
   if (output != NULL && options->force == 0) {
     free(output_filename);
-    return 0; // TODO: error
+    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
+    sprintf(msg, "couldn't write output to file: %s", output_filename);
+    io_error(msg);
+    free(msg);
+    return 0;
   }
   fclose(output);
   output = fopen(output_filename, "w");
@@ -101,6 +120,11 @@ int io_write(list_t *nodes, list_t *splines)
     free(poly_str);
   }
 
+  char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
+  sprintf(msg, "output written to file: %s", output_filename);
+  io_log(msg);
+  free(msg);
+
   fclose(output);
   free(output_filename);
   return 1;
@@ -111,7 +135,7 @@ int io_write(list_t *nodes, list_t *splines)
 int io_gnuplot(list_t *nodes, list_t *splines)
 {
   if (!options->gnuplot) {
-    return 1; // TODO: log
+    return 1;
   }
 
   const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
@@ -120,9 +144,14 @@ int io_gnuplot(list_t *nodes, list_t *splines)
 
   FILE *gnuplot = fopen(gnuplot_filename, "w");
   if (!gnuplot) {
+    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
+    sprintf(msg, "couldn't write gnuplot output to: %s", gnuplot_filename);
+    io_log(msg);
+    free(msg);
+
     free(plot_filename);
     free(gnuplot_filename);
-    return 0; // TODO: error
+    return 0;
   }
 
   time_t rawtime;
@@ -170,6 +199,11 @@ int io_gnuplot(list_t *nodes, list_t *splines)
     fprintf(gnuplot, "\t\t%lg %lg\n", p->x, p->y);
   }
   fprintf(gnuplot, "\te\n");
+
+  char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
+  sprintf(msg, "gnuplot output written to file: %s", gnuplot_filename);
+  io_log(msg);
+  free(msg);
  
   fclose(gnuplot);
   free(plot_filename);
