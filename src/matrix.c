@@ -6,11 +6,11 @@
 #include "epsilon.h"
 #include "matrix.h"
 
-static int matrix_find_max_in_column(matrix_t *A, int i);
+static int matrix_find_max_in_column(const matrix_t *A, int i);
 static void matrix_swap_rows(matrix_t *A, int lh, int rh);
 static void matrix_add_rows(matrix_t *A, int lh, double coeff, int rh);
 static void matrix_subtract_rows(matrix_t *A, int lh, double coeff, int rh);
-static int matrix_is_square(matrix_t *A);
+static int matrix_is_square(const matrix_t *A);
 
 matrix_t *matrix_new(const double *t, int r, int c)
 {
@@ -105,7 +105,7 @@ char *matrix_to_str(const matrix_t *m)
   return str;
 }
 
-static int matrix_find_max_in_column(matrix_t *A, int i)
+static int matrix_find_max_in_column(const matrix_t *A, int i)
 {
   int max_i = i;
   int n = A->r;
@@ -147,7 +147,7 @@ static void matrix_subtract_rows(matrix_t *A, int lh, double coeff, int rh)
   matrix_add_rows(A, lh, (-1.0)*coeff, rh);
 }
 
-static int matrix_is_square(matrix_t *A)
+static int matrix_is_square(const matrix_t *A)
 {
   return (A->r == A->c) && (A->c > 0);
 }
