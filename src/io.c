@@ -9,7 +9,11 @@
 #include "polynomial.h"
 #include "options.h"
 
+
+
 static char *io_change_filename_extension(const char *filename, const char *extension);
+
+
 
 list_t *io_read()
 {
@@ -58,6 +62,8 @@ list_t *io_read()
   return points; // TODO: log
 }
 
+
+
 int io_write(list_t *nodes, list_t *splines)
 {
   char *output_filename = NULL;
@@ -99,6 +105,8 @@ int io_write(list_t *nodes, list_t *splines)
   free(output_filename);
   return 1;
 }
+
+
 
 int io_gnuplot(list_t *nodes, list_t *splines)
 {
@@ -168,6 +176,29 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   free(gnuplot_filename);
   return 1;
 }
+
+
+
+void io_bare_log(const char *type, const char *msg)
+{
+  if (options->quiet) {
+    return;
+  }
+
+  const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
+  char *log_filename = io_change_filename_extension(output_filename, ".log");
+  static FILE *log = NULL;
+  if (!log)
+    log = fopen(log_filename, "w");
+
+  fprintf(log, "%s\n", msg);
+  if (strcmp(type, "error") == 0)
+    fprintf(stderr, "%s\n", msg);
+
+  free(log_filename);
+}
+
+
 
 static char *io_change_filename_extension(const char *filename, const char *extension)
 {
