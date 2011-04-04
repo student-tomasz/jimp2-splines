@@ -7,12 +7,30 @@
 #include "list.h"
 #include "point_list.h"
 #include "polynomial.h"
+#include "options.h"
 
-list_t *io_read(const char *source_filename)
+static char *io_change_filename_extension(char *filename, char *extension)
+{
+  char *new_filename = malloc(sizeof(*new_filename) * (strlen(filename)+strlen(extension)+2));
+  strcpy(new_filename, filename);
+
+  if (strlen(extension) == 0) {
+    return new_filename;
+  }
+
+  char *dot = strrchr(new_filename, '.');
+  if (dot)
+    strcpy(dot, extension);
+  else
+    strcat(new_filename, extension);
+  return new_filename;
+}
+
+list_t *io_read()
 {
   FILE *source = NULL;
-  if (source_filename)
-    source = fopen(source_filename, "r");
+  if (options->in_filename)
+    source = fopen(options->in_filename, "r");
   else
     source = stdin;
 
@@ -55,9 +73,23 @@ list_t *io_read(const char *source_filename)
   return points; // TODO: log
 }
 
-int io_write(const char* output_filename, list_t *nodes, list_t *splines)
+int io_write(list_t *nodes, list_t *splines)
 {
-  FILE *output = fopen(output_filename, "w");
+  char *output_filename = NULL;
+  if (options->out_filename) {
+    output_filename = io_change_filename_extension(options->out_filename, "");
+  }
+  else {
+    output_filename = io_change_filename_extension(options->in_filename, ".out");
+  }
+
+  FILE *output = fopen(output_filename, "r");
+  if (output != NULL && options->force == 0) {
+    free(output_filename);
+    return 0; // TODO: error
+  }
+  fclose(output);
+  output = fopen(output_filename, "w");
 
   time_t rawtime;
   time(&rawtime);
@@ -79,22 +111,28 @@ int io_write(const char* output_filename, list_t *nodes, list_t *splines)
   }
 
   fclose(output);
+  free(output_filename);
   return 1;
 }
 
-int io_gnuplot(const char* gnuplot_filename, list_t *nodes, list_t *splines)
+int io_gnuplot(list_t *nodes, list_t *splines)
 {
+  if (!options->gnuplot) {
+    return 1; // TODO: log
+  }
+
+  char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
+  char *gnuplot_filename = io_change_filename_extension(output_filename, ".plt");
+  char *plot_filename = io_change_filename_extension(output_filename, ".png");
+
   FILE *gnuplot = fopen(gnuplot_filename, "w");
-  char *plot_file = malloc(sizeof(*plot_file) * (strlen(gnuplot_filename)+1));
-  strcpy(plot_file, gnuplot_filename);
-  strcpy(plot_file+strlen(gnuplot_filename)-3, "png");
 
   time_t rawtime;
   time(&rawtime);
   fprintf(gnuplot, "# created at: %s", ctime(&rawtime));
   fprintf(gnuplot, "#       file: %s\n", gnuplot_filename);
   fprintf(gnuplot, "set term png size 800, 600\n");
-  fprintf(gnuplot, "set output \"%s\"\n", plot_file);
+  fprintf(gnuplot, "set output \"%s\"\n", plot_filename);
   fprintf(gnuplot, "set nokey\n");
   fprintf(gnuplot, "set notitle\n");
   fprintf(gnuplot, "set grid\n");
@@ -136,7 +174,8 @@ int io_gnuplot(const char* gnuplot_filename, list_t *nodes, list_t *splines)
   fprintf(gnuplot, "\te\n");
  
   fclose(gnuplot);
-  free(plot_file);
+  free(plot_filename);
+  free(gnuplot_filename);
   return 1;
 }
 

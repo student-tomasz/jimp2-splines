@@ -8,12 +8,12 @@
 #include "../point_list.h"
 #include "../spline.h"
 #include "../polynomial.h"
+#include "../options.h"
 
 static int read_correct_file()
 {
   const char *file = "correct_file.dat";
   FILE *source = fopen(file, "w");
-
   int i, m = 2;
   point_t **should_be_nodes = malloc(sizeof(*should_be_nodes) * (m+1));
   should_be_nodes[0] = point_new(1, 2);
@@ -23,8 +23,11 @@ static int read_correct_file()
     fprintf(source, "%lg %lg\n", should_be_nodes[i]->x, should_be_nodes[i]->y);
   }
   fclose(source);
+
+  options_init();
+  options->in_filename = file;
   
-  list_t *nodes = io_read(file);
+  list_t *nodes = io_read();
   list_t *node;
   if (!nodes) {
     mu_assert(0);
@@ -54,8 +57,11 @@ static int read_correct_file_with_poor_formating()
   fprintf(source, "\t%lg %lg", should_be_nodes[1]->x, should_be_nodes[1]->y);
 
   fclose(source);
+
+  options_init();
+  options->in_filename = file;
   
-  list_t *nodes = io_read(file);
+  list_t *nodes = io_read();
   list_t *node;
   if (!nodes) {
     mu_assert(0);
@@ -87,8 +93,11 @@ static int read_correct_file_with_poor_formating_and_duplicate_points()
   fprintf(source, "\t%lg %lg", should_be_nodes[1]->x, should_be_nodes[1]->y);
 
   fclose(source);
+
+  options_init();
+  options->in_filename = file;
   
-  list_t *nodes = io_read(file);
+  list_t *nodes = io_read();
   list_t *node;
   if (!nodes) {
     mu_assert(0);
@@ -119,10 +128,13 @@ static int write_correct_file()
   list_t *nodes = io_read(source_file);
   list_t *splines = spline_interpolate(nodes);
 
-  const char* output_file = "correct_source_file.out";
-  io_write(output_file, nodes, splines);
-  const char* gnuplot_file = "correct_source_file.plt";
-  io_gnuplot(gnuplot_file, nodes, splines);
+  options_init();
+  options->force = 1;
+  options->gnuplot = 1;
+  options->in_filename = source_file;
+
+  io_write(nodes, splines);
+  io_gnuplot(nodes, splines);
 
   mu_assert(1);
 }
