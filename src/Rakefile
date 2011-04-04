@@ -20,7 +20,7 @@ file $exec => $objs do |t|
   sh "#{$cc} #{$cf} #{t.prerequisites.join(' ')} -o #{t.name}"
 end
 
-file $test_exec => [$objs, $test_objs].flatten do |t|
+file $test_exec => ([$objs, $test_objs].flatten - ['main.o']) do |t|
   sh "#{$cc} #{$cf} #{t.prerequisites.join(' ')} -o #{t.name}"
 end
 
@@ -33,7 +33,7 @@ end
 
 desc "Removes all build products"
 task :clean do |t|
-  rm_r [$objs, $test_objs, $build_dir].flatten rescue nil
+  [$objs, $test_objs, $build_dir].flatten.each { |f| rm_rf f }
 end
 
 desc "Run all tests"
