@@ -225,9 +225,9 @@ void io_bare_log(const char *type, const char *msg)
   if (!log)
     log = fopen(log_filename, "w");
 
-  fprintf(log, "%s\n", msg);
+  fprintf(log, "[%5s] %s\n", type, msg);
   if (strcmp(type, "error") == 0)
-    fprintf(stderr, "%s\n", msg);
+    fprintf(stderr, "[%5s] %s\n", type, msg);
 
   free(log_filename);
 }

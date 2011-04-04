@@ -14,7 +14,7 @@ int io_gnuplot(list_t *nodes, list_t *splines);
 
 #define io_msg(_msg_type, _msg_bare)\
   char *_msg = malloc(sizeof(*_msg) * (strlen(_msg_bare)+MAX_STR_LENGTH+1));\
-  sprintf(_msg, "[%5s] %s:%d:%s(): %s", _msg_type, __FILE__, __LINE__, __func__, _msg_bare);\
+  sprintf(_msg, "%s:%d:%s(): %s", __FILE__, __LINE__, __func__, _msg_bare);\
   io_bare_log(_msg_type, _msg);\
   free(_msg);
 
