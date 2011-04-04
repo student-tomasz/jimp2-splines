@@ -1,0 +1,6 @@
+[submodule "spec/func"]
+	path = spec/func
+	url = git@github.com:student-tomasz/jimp2-splines-funkcjonalnosc.git
+[submodule "spec/impl"]
+	path = spec/impl
+	url = git@github.com:student-tomasz/jimp2-splines-implementacja.git
