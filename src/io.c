@@ -9,22 +9,7 @@
 #include "polynomial.h"
 #include "options.h"
 
-static char *io_change_filename_extension(const char *filename, const char *extension)
-{
-  char *new_filename = malloc(sizeof(*new_filename) * (strlen(filename)+strlen(extension)+2));
-  strcpy(new_filename, filename);
-
-  if (strlen(extension) == 0) {
-    return new_filename;
-  }
-
-  char *dot = strrchr(new_filename, '.');
-  if (dot)
-    strcpy(dot, extension);
-  else
-    strcat(new_filename, extension);
-  return new_filename;
-}
+static char *io_change_filename_extension(const char *filename, const char *extension);
 
 list_t *io_read()
 {
@@ -177,5 +162,22 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   free(plot_filename);
   free(gnuplot_filename);
   return 1;
+}
+
+static char *io_change_filename_extension(const char *filename, const char *extension)
+{
+  char *new_filename = malloc(sizeof(*new_filename) * (strlen(filename)+strlen(extension)+2));
+  strcpy(new_filename, filename);
+
+  if (strlen(extension) == 0) {
+    return new_filename;
+  }
+
+  char *dot = strrchr(new_filename, '.');
+  if (dot)
+    strcpy(dot, extension);
+  else
+    strcat(new_filename, extension);
+  return new_filename;
 }
 
