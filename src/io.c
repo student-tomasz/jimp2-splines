@@ -8,9 +8,14 @@
 #include "point_list.h"
 #include "polynomial.h"
 
-list_t *io_read(const char *source_file)
+list_t *io_read(const char *source_filename)
 {
-  FILE *source = fopen(source_file, "r");
+  FILE *source = NULL;
+  if (source_filename)
+    source = fopen(source_filename, "r");
+  else
+    source = stdin;
+
   if (!source) {
     return NULL; // TODO: error
   }
@@ -33,7 +38,7 @@ list_t *io_read(const char *source_file)
       break; // TODO: log
     }
     else {
-      fclose(source);
+      if (source != stdin) fclose(source);
       return NULL; // TODO: error
     }
   }
@@ -45,19 +50,19 @@ list_t *io_read(const char *source_file)
     point_free(points_array[i]);
   }
   free(points_array);
-  fclose(source);
+  if (source != stdin) fclose(source);
 
   return points; // TODO: log
 }
 
-int io_write(const char* output_file, list_t *nodes, list_t *splines)
+int io_write(const char* output_filename, list_t *nodes, list_t *splines)
 {
-  FILE *output = fopen(output_file, "w");
+  FILE *output = fopen(output_filename, "w");
 
   time_t rawtime;
   time(&rawtime);
   fprintf(output, "# created at: %s", ctime(&rawtime));
-  fprintf(output, "#       file: %s\n", output_file);
+  fprintf(output, "#       file: %s\n", output_filename);
   fprintf(output, "# [x=x_{n1}:x_{n2}] fun_n(x) =  a_{n0} + a_{n1}*x + a_{n2}*x**2 + a_{n3}*x**3\n");
 
   list_t *spline = splines;
@@ -77,17 +82,17 @@ int io_write(const char* output_file, list_t *nodes, list_t *splines)
   return 1;
 }
 
-int io_gnuplot(const char* gnuplot_file, list_t *nodes, list_t *splines)
+int io_gnuplot(const char* gnuplot_filename, list_t *nodes, list_t *splines)
 {
-  FILE *gnuplot = fopen(gnuplot_file, "w");
-  char *plot_file = malloc(sizeof(*plot_file) * (strlen(gnuplot_file)+1));
-  strcpy(plot_file, gnuplot_file);
-  strcpy(plot_file+strlen(gnuplot_file)-3, "png");
+  FILE *gnuplot = fopen(gnuplot_filename, "w");
+  char *plot_file = malloc(sizeof(*plot_file) * (strlen(gnuplot_filename)+1));
+  strcpy(plot_file, gnuplot_filename);
+  strcpy(plot_file+strlen(gnuplot_filename)-3, "png");
 
   time_t rawtime;
   time(&rawtime);
   fprintf(gnuplot, "# created at: %s", ctime(&rawtime));
-  fprintf(gnuplot, "#       file: %s\n", gnuplot_file);
+  fprintf(gnuplot, "#       file: %s\n", gnuplot_filename);
   fprintf(gnuplot, "set term png size 800, 600\n");
   fprintf(gnuplot, "set output \"%s\"\n", plot_file);
   fprintf(gnuplot, "set nokey\n");
