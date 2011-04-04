@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "cli.h"
 #include "options.h"
+#include "io.h"
 
 int cli_parse(const int argc, const char **argv)
 {
@@ -25,13 +26,14 @@ int cli_parse(const int argc, const char **argv)
     }
 
     if (!flag) {
-      return 0; // TODO: error
+      return 0;
     }
     else if (flag->args > 0) {
       if (i+1 < argc)
         options_set_with_arg(flag, argv[++i]);
-      else
-        return 0; // TODO: error
+      else {
+        return 0;
+      }
     }
     else {
       options_set(flag);
@@ -39,8 +41,10 @@ int cli_parse(const int argc, const char **argv)
   }
 
   if (options->out_filename == NULL && options->in_filename == NULL) {
-    return 0; // TODO: error
+    fprintf(stderr, "[error] %s:%d:%s(): at least one filename (input or output) has to declared\n", __FILE__, __LINE__, __func__);
+    return 0;
   }
 
-  return 1; // TODO: log
+  io_log("parsed arguments from command line");
+  return 1;
 }
