@@ -222,8 +222,14 @@ void io_bare_log(const char *type, const char *msg)
   const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
   char *log_filename = io_change_filename_extension(output_filename, ".log");
   static FILE *log = NULL;
-  if (!log)
+  if (!log) {
     log = fopen(log_filename, "w");
+
+    time_t rawtime;
+    time(&rawtime);
+    fprintf(log, "# created at: %s", ctime(&rawtime));
+    fprintf(log, "#       file: %s\n", log_filename);
+  }
 
   fprintf(log, "[%5s] %s\n", type, msg);
   if (strcmp(type, "error") == 0)
