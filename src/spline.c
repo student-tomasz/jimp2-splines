@@ -5,6 +5,7 @@
 #include "polynomial.h"
 #include "matrix.h"
 #include "spline.h"
+#include "io.h"
 
 list_t *spline_interpolate(list_t *nodes)
 {
@@ -69,6 +70,10 @@ list_t *spline_interpolate(list_t *nodes)
 
   /* guass that frickin' matrix */
   k = matrix_gauss(A, b);
+  if (!k) {
+    io_error("splines couldn't be found");
+    return NULL;
+  }
 
   /* get all the polynomials */
   list_t *splines = NULL;
@@ -83,6 +88,7 @@ list_t *spline_interpolate(list_t *nodes)
   free(y);
   free(x);
 
+  io_log("splines found");
   return splines;
 }
 

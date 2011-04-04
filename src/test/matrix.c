@@ -2,6 +2,7 @@
 #include "minunit.h"
 #include "../epsilon.h"
 #include "../matrix.h"
+#include "../options.h"
 
 static int matrix_is_equal(matrix_t *lh, matrix_t *rh) {
   if (lh->r != rh->r || lh->c != rh->c) {
@@ -65,6 +66,9 @@ static int gauss_with_gotchas()
 
 int all_matrix_tests()
 {
+  options_init();
+  options->quiet = 1;
+
   int (*tests[])() = {
     gauss_with_no_gotchas,
     bigger_gauss_with_no_gotchas,

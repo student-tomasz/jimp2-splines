@@ -4,6 +4,7 @@
 #include "../list.h"
 #include "../point.h"
 #include "../spline.h"
+#include "../options.h"
 
 static int basic_spline()
 {
@@ -32,6 +33,9 @@ static int basic_spline()
 
 int all_spline_tests()
 {
+  options_init();
+  options->quiet = 1;
+
   int (*tests[])() = {
     basic_spline
   };
