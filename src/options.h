@@ -4,8 +4,8 @@
 #include "flag.h"
 
 struct {
-  char *in_filename;
-  char *out_filename;
+  const char *in_filename;
+  const char *out_filename;
   int gnuplot;
   int force;
   int quiet;

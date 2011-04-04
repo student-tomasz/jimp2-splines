@@ -7,7 +7,7 @@ int cli_parse(int argc, const char **argv)
   options_init();
 
   flag_t *flag;
-  char *arg;
+  const char *arg;
   int i;
   for (arg = argv[i=1]; i < argc; arg = argv[++i]) {
     flag = NULL;

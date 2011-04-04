@@ -9,7 +9,7 @@
 #include "polynomial.h"
 #include "options.h"
 
-static char *io_change_filename_extension(char *filename, char *extension)
+static char *io_change_filename_extension(const char *filename, const char *extension)
 {
   char *new_filename = malloc(sizeof(*new_filename) * (strlen(filename)+strlen(extension)+2));
   strcpy(new_filename, filename);
@@ -121,7 +121,7 @@ int io_gnuplot(list_t *nodes, list_t *splines)
     return 1; // TODO: log
   }
 
-  char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
+  const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
   char *gnuplot_filename = io_change_filename_extension(output_filename, ".plt");
   char *plot_filename = io_change_filename_extension(output_filename, ".png");
 
