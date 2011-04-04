@@ -111,6 +111,11 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   char *plot_filename = io_change_filename_extension(output_filename, ".png");
 
   FILE *gnuplot = fopen(gnuplot_filename, "w");
+  if (!gnuplot) {
+    free(plot_filename);
+    free(gnuplot_filename);
+    return 0; // TODO: error
+  }
 
   time_t rawtime;
   time(&rawtime);
