@@ -2,7 +2,7 @@
 #include "cli.h"
 #include "options.h"
 
-int cli_parse(int argc, const char **argv)
+int cli_parse(const int argc, const char **argv)
 {
   options_init();
 

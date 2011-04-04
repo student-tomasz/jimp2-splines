@@ -3,8 +3,8 @@
 
 #define EPSILON 1e-12
 
-int is_equal(double l, double r);
-int is_zero(double l);
+int is_equal(const double l, const double r);
+int is_zero(const double l);
 
 #endif /* _EPSILON_H */
 
