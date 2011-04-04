@@ -60,7 +60,7 @@ list_t *io_read()
     }
     else {
       if (source != stdin) fclose(source);
-      io_error("couldn't read data");
+      io_error("couldn't read from data file or data file is invalid");
       return NULL;
     }
   }
