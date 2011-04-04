@@ -108,7 +108,7 @@ int io_gnuplot(list_t *nodes, list_t *splines)
 
   const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
   char *gnuplot_filename = io_change_filename_extension(output_filename, ".plt");
-  char *plot_filename = io_change_filename_extension(output_filename, ".png");
+  char *plot_filename = io_change_filename_extension(output_filename, ".pdf");
 
   FILE *gnuplot = fopen(gnuplot_filename, "w");
   if (!gnuplot) {
@@ -121,7 +121,7 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   time(&rawtime);
   fprintf(gnuplot, "# created at: %s", ctime(&rawtime));
   fprintf(gnuplot, "#       file: %s\n", gnuplot_filename);
-  fprintf(gnuplot, "set term png size 800, 600\n");
+  fprintf(gnuplot, "set term pdf\n");
   fprintf(gnuplot, "set output \"%s\"\n", plot_filename);
   fprintf(gnuplot, "set nokey\n");
   fprintf(gnuplot, "set notitle\n");
