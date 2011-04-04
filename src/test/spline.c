@@ -20,16 +20,14 @@ static int basic_spline()
   double c1[] = { -1.065625, 2.984375, -0.609375, 0.040625 };
   should_be_splines[1] = polynomial_new(c1, 3);
 
-  int result = 1;
   int i;
   list_t *spline = NULL;
   for (i = 0, spline = splines; i < m; ++i, spline = spline->next) {
     if (!polynomial_is_equal((polynomial_t *)spline->data, should_be_splines[i]))
-      result = 0;
+      mu_assert(0);
   }
 
-  mu_assert(result);
-  return 0;
+  mu_assert(1);
 }
 
 int all_spline_tests()

@@ -27,7 +27,7 @@ static int read_correct_file()
   list_t *nodes = io_read(file);
   list_t *node;
   if (!nodes) {
-    return 1;
+    mu_assert(0);
   }
   for (node = nodes, i = 0; i < m+1; node = node->next, ++i) {
     /* printf("lol: %s == %s\n", point_to_str((point_t *)node->data), point_to_str(should_be_nodes[i]));*/
@@ -58,7 +58,7 @@ static int read_correct_file_with_poor_formating()
   list_t *nodes = io_read(file);
   list_t *node;
   if (!nodes) {
-    return 1;
+    mu_assert(0);
   }
   for (node = nodes, i = 0; i < m+1; node = node->next, ++i) {
     /* printf("lol: %s == %s\n", point_to_str((point_t *)node->data), point_to_str(should_be_nodes[i]));*/
@@ -67,7 +67,6 @@ static int read_correct_file_with_poor_formating()
   }
 
   mu_assert(1);
-  return 0;
 }
 
 static int read_correct_file_with_poor_formating_and_duplicate_points()
@@ -92,7 +91,7 @@ static int read_correct_file_with_poor_formating_and_duplicate_points()
   list_t *nodes = io_read(file);
   list_t *node;
   if (!nodes) {
-    return 1;
+    mu_assert(0);
   }
   for (node = nodes, i = 0; i < m+1; node = node->next, ++i) {
     if (!point_is_equal((point_t *)node->data, should_be_nodes[i]))

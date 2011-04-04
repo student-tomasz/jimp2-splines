@@ -28,12 +28,6 @@ static int gauss_with_no_gotchas()
 
   matrix_t *x = matrix_gauss(A, b);
   mu_assert(matrix_is_equal(x, should_be_x));
-
-  matrix_free(x);
-  matrix_free(should_be_x);
-  matrix_free(b);
-  matrix_free(A);
-  return 0;
 }
 
 static int bigger_gauss_with_no_gotchas()
@@ -45,22 +39,8 @@ static int bigger_gauss_with_no_gotchas()
   double tx[] = {2, 3, -1};
   matrix_t *should_be_x = matrix_new(tx, 3, 1);
 
-  /* printf("%s:%d: test %s says:\n", __FILE__, __LINE__, __func__);*/
-
-  /* printf("%s:%d: test %s says:\n", __FILE__, __LINE__, __func__);*/
-  /* printf("matrix A:\n%s\n", matrix_to_str(A));*/
-  /* printf("matrix b:\n%s\n", matrix_to_str(b));*/
-
   matrix_t *x = matrix_gauss(A, b);
   mu_assert(matrix_is_equal(x, should_be_x));
-
-  /* printf("after gauss matrix x:\n%s\n", matrix_to_str(x));*/
-
-  matrix_free(x);
-  matrix_free(should_be_x);
-  matrix_free(b);
-  matrix_free(A);
-  return 0;
 }
 
 static int gauss_with_gotchas()
@@ -79,21 +59,13 @@ static int gauss_with_gotchas()
   double tx[] = {1, 2, 3, 4, 5, 6};
   matrix_t *should_be_x = matrix_new(tx, 6, 1);
 
-  /* printf("%s:%d: test %s says:\n", __FILE__, __LINE__, __func__); */
   matrix_t *x = matrix_gauss(A, b);
   mu_assert(matrix_is_equal(x, should_be_x));
-
-  matrix_free(x);
-  matrix_free(should_be_x);
-  matrix_free(b);
-  matrix_free(A);
-  return 0;
 }
 
 int all_matrix_tests()
 {
   int (*tests[])() = {
-    /* create_the_simplest_matrix, */
     gauss_with_no_gotchas,
     bigger_gauss_with_no_gotchas,
     gauss_with_gotchas
