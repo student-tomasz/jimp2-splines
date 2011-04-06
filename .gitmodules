@@ -4,3 +4,6 @@
 [submodule "spec/impl"]
 	path = spec/impl
 	url = git@github.com:student-tomasz/jimp2-splines-implementacja.git
+[submodule "spec/dead"]
+	path = spec/dead
+	url = git@github.com:student-tomasz/jimp2-splines-sprawozdanie.git
