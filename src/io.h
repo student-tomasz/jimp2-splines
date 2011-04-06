@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include "list.h"
 
 #define MAX_STR_LENGTH 1024
