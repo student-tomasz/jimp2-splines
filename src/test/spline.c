@@ -57,9 +57,6 @@ static int another_basic_spline()
 }
 int all_spline_tests()
 {
-  options_init();
-  options->quiet = 1;
-
   int (*tests[])() = {
     basic_spline,
     another_basic_spline
