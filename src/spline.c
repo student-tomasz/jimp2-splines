@@ -32,7 +32,8 @@ list_t *spline_interpolate(list_t *nodes)
   /* fill matrix A with values of polynomials */
   for (i = 0; i < m; ++i) {       /* for each polynomial */
     for (j = 0; j < 2; ++j) {     /* we have two points */
-      for (l = 0; l < d; ++l) {   /* and their values describe d coefficients */
+      A->t[((2*i+j)*(A->c))+(i*d)] = 1;
+      for (l = 1; l < d; ++l) {   /* and their values describe d coefficients */
         A->t[((2*i+j)*(A->c))+(i*d+l)] = pow(x[i+j], l);
       }
       b->t[2*i+j] = y[i+j];
@@ -43,7 +44,7 @@ list_t *spline_interpolate(list_t *nodes)
   int last_row = 2*i;
   for (i = 1; i <= m-1; ++i, ++last_row) { /* for each point in between */
     for (j = 0; j < 2; ++j) {              /* we have two polynomials */
-      for (l = 0; l < d; ++l) {
+      for (l = 1; l < d; ++l) {
         A->t[(last_row*(A->c))+(d*(i-1+j)+l)] = l*pow(x[i], l-1)*pow(-1, j);
       }
     }
@@ -53,7 +54,7 @@ list_t *spline_interpolate(list_t *nodes)
   /* fill matrix A with values from second derivatives */
   for (i = 1; i <= m-1; ++i, ++last_row) { /* for each point in between */
     for (j = 0; j < 2; ++j) {              /* we have two polynomials */
-      for (l = 0; l < d; ++l) {
+      for (l = 2; l < d; ++l) {
         A->t[(last_row*(A->c))+(d*(i-1+j)+l)] = l*(l-1)*pow(x[i], l-2)*pow(-1, j);
       }
     }
@@ -62,16 +63,24 @@ list_t *spline_interpolate(list_t *nodes)
 
   /* fill the rest of A with margin cases */
   for (j = 0; j < 2; ++j, ++last_row) {    /* two margin points: 0 - first & 1 - last */
-    for (l = 0; l < d; ++l) {
+    for (l = 2; l < d; ++l) {
       A->t[(last_row*(A->c))+(d*(j*(m-1))+l)] = l*(l-1)*pow(x[j*m], l-2);
     }
     b->t[last_row] = 0;
   }
 
   /* guass that frickin' matrix */
+  io_log("gaussian elimination for A*k = b");
+  char *matrix_str = matrix_to_str(A);
+  io_log(matrix_str);
+  free(matrix_str);
+  matrix_str = matrix_to_str(b);
+  io_log(matrix_str);
+  free(matrix_str);
+
   k = matrix_gauss(A, b);
   if (!k) {
-    io_error("splines couldn't be found");
+    io_error("gauss couldn't find splines");
     return NULL;
   }
 
