@@ -12,8 +12,10 @@ list_t *io_read();
 int io_write(list_t *nodes, list_t *splines);
 int io_gnuplot(list_t *nodes, list_t *splines);
 
+char *_msg;
+
 #define io_msg(_msg_type, _msg_bare)\
-  char *_msg = malloc(sizeof(*_msg) * (strlen(_msg_bare)+MAX_STR_LENGTH+1));\
+  _msg = malloc(sizeof(*_msg) * (strlen(_msg_bare)+MAX_STR_LENGTH+1));\
   sprintf(_msg, "%s:%d:%s(): %s", __FILE__, __LINE__, __func__, _msg_bare);\
   io_bare_log(_msg_type, _msg);\
   free(_msg);
