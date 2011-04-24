@@ -3,12 +3,12 @@
 #include "minunit.h"
 #include "io.h"
 #include "../io.h"
+#include "../options.h"
 #include "../point.h"
 #include "../list.h"
 #include "../point_list.h"
 #include "../spline.h"
 #include "../polynomial.h"
-#include "../options.h"
 
 static int read_correct_file()
 {
