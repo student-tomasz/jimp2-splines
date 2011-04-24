@@ -5,6 +5,7 @@
 #include "matrix.h"
 #include "epsilon.h"
 #include "io.h"
+#include "logger.h"
 
 static matrix_t *matrix_copy(const matrix_t *m);
 static int matrix_find_max_in_column(const matrix_t *A, int i);
@@ -46,7 +47,7 @@ void matrix_free(matrix_t *m)
 matrix_t *matrix_gauss(const matrix_t *_A, const matrix_t *_b)
 {
   if (!matrix_is_square(_A)) {
-    io_error("matrix isn't square");
+    log_error("matrix isn't square");
     return NULL;
   }
 
@@ -57,7 +58,7 @@ matrix_t *matrix_gauss(const matrix_t *_A, const matrix_t *_b)
   for (i = 0; i < n; ++i) {
     int max_i = matrix_find_max_in_column(A, i);
     if (is_zero(A->t[max_i*n+i])) {
-      io_error("matrix has an empty column, which gives more than one solution");
+      log_error("matrix has an empty column, which gives more than one solution");
       return NULL;
     }
     matrix_swap_rows(A, i, max_i);

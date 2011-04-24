@@ -2,6 +2,7 @@
 #include "cli.h"
 #include "options.h"
 #include "io.h"
+#include "logger.h"
 
 int cli_parse(const int argc, const char **argv)
 {
@@ -41,10 +42,10 @@ int cli_parse(const int argc, const char **argv)
   }
 
   if (options->out_filename == NULL && options->in_filename == NULL) {
-    io_error("at least one filename (input or output) has to declared");
+    log_error("at least one filename (input or output) has to declared");
     return 0;
   }
 
-  io_info("parsed arguments from command line");
+  log_info("parsed arguments from command line");
   return 1;
 }

@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdarg.h>
 #include "io.h"
+#include "logger.h"
 #include "point.h"
 #include "list.h"
 #include "point_list.h"
@@ -18,15 +19,15 @@ list_t *io_read()
   FILE *source = NULL;
   if (options->in_filename) {
     source = fopen(options->in_filename, "r");
-    io_info("reading data from file: %s", options->in_filename);
+    log_info("reading data from file: %s", options->in_filename);
   }
   else {
     source = stdin;
-    io_info("reading data from standard input");
+    log_info("reading data from standard input");
   }
 
   if (!source) {
-    io_error("input stream is invalid");
+    log_error("input stream is invalid");
     return NULL;
   }
 
@@ -47,12 +48,12 @@ list_t *io_read()
       read_sum += 1;
     }
     else if (read_count == EOF) {
-      io_info("read %d points", read_sum);
+      log_info("read %d points", read_sum);
       break;
     }
     else {
       if (source != stdin) fclose(source);
-      io_error("input data is corrupted");
+      log_error("input data is corrupted");
       return NULL;
     }
   }
@@ -83,7 +84,7 @@ int io_write(list_t *nodes, list_t *splines)
 
   FILE *output = fopen(output_filename, "r");
   if (output != NULL && options->force == 0) {
-    io_error("couldn't write output to %s", output_filename);
+    log_error("couldn't write output to %s", output_filename);
     free(output_filename);
     return 0;
   }
@@ -109,7 +110,7 @@ int io_write(list_t *nodes, list_t *splines)
     free(poly_str);
   }
 
-  io_info("output written to %s", output_filename);
+  log_info("output written to %s", output_filename);
   fclose(output);
   free(output_filename);
   return 1;
@@ -129,7 +130,7 @@ int io_gnuplot(list_t *nodes, list_t *splines)
 
   FILE *gnuplot = fopen(gnuplot_filename, "w");
   if (!gnuplot) {
-    io_info("couldn't write gnuplot output to %s", gnuplot_filename);
+    log_info("couldn't write gnuplot output to %s", gnuplot_filename);
     free(plot_filename);
     free(gnuplot_filename);
     return 0;
@@ -181,45 +182,10 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   }
   fprintf(gnuplot, "\te\n");
 
-  io_info("gnuplot output written to %s", gnuplot_filename);
+  log_info("gnuplot output written to %s", gnuplot_filename);
   fclose(gnuplot);
   free(plot_filename);
   free(gnuplot_filename);
   return 1;
-}
-
-
-
-void io_log_impl(const char *file, const int line, const char *type, const char *msg, ...)
-{
-  if (!options || options->quiet) return;
-
-  static FILE *log = NULL;
-  if (!log && (options->in_filename || options->out_filename)) {
-    const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
-    char *log_filename = file_helpers_change_extension(output_filename, ".log");
-
-    log = fopen(log_filename, "w");
-    time_t rawtime;
-    time(&rawtime);
-    fprintf(log, "# created at: %s", ctime(&rawtime));
-    fprintf(log, "#       file: %s\n", log_filename);
-
-    free(log_filename);
-  }
-
-  const char log_fmt[] = "%s:%d: [%s] %s\n"; 
-  char *log_msg;
-  va_list ap;
-  va_start(ap, msg);
-  vasprintf(&log_msg, msg, ap);
-  va_end(ap);
-  
-  if (log)
-    fprintf(log, log_fmt, file, line, type, log_msg);
-  if (strcmp(type, "error") == 0)
-    fprintf(stderr, log_fmt, file, line, type, log_msg);
-
-  free(log_msg);
 }
 

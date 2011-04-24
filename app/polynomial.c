@@ -3,8 +3,8 @@
 #include <string.h>
 #include <math.h>
 #include "epsilon.h"
-#include "io.h"
 #include "polynomial.h"
+#include "io.h"
 
 polynomial_t *polynomial_new(double *coeffs, int degree)
 {
