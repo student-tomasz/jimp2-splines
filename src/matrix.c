@@ -11,6 +11,7 @@ static void matrix_swap_rows(matrix_t *A, int lh, int rh);
 static void matrix_add_rows(matrix_t *A, int lh, double coeff, int rh);
 static void matrix_subtract_rows(matrix_t *A, int lh, double coeff, int rh);
 static int matrix_is_square(const matrix_t *A);
+static matrix_t *matrix_solve_upper_diagonal(const matrix_t *A, const matrix_t *b);
 
 matrix_t *matrix_new(const double *t, int r, int c)
 {
@@ -42,7 +43,6 @@ matrix_t *matrix_gauss(const matrix_t *A, const matrix_t *b)
     return NULL; // TODO: error
   }
   matrix_t *Q = matrix_new(A->t, A->r, A->c);
-  matrix_t *x = matrix_new(NULL, b->r, b->c);
   matrix_t *r = matrix_new(b->t, b->r, b->c);
 
   int n = Q->c;
@@ -62,14 +62,7 @@ matrix_t *matrix_gauss(const matrix_t *A, const matrix_t *b)
     }
   }
 
-  for (i = n-1; i >= 0; --i) {
-    double s = 0.0;
-    for (j = i+1; j < n; ++j) {
-      s += Q->t[i*n+j] * x->t[j];
-    }
-    x->t[i] = (r->t[i]-s)/Q->t[i*n+i];
-  }
-
+  matrix_t *x = matrix_solve_upper_diagonal(Q, r);
   matrix_free(r);
   matrix_free(Q);
   return x;
@@ -150,5 +143,21 @@ static void matrix_subtract_rows(matrix_t *A, int lh, double coeff, int rh)
 static int matrix_is_square(const matrix_t *A)
 {
   return (A->r == A->c) && (A->c > 0);
+}
+
+static matrix_t *matrix_solve_upper_diagonal(const matrix_t *A, const matrix_t *b)
+{
+  matrix_t *x = matrix_new(NULL, b->r, b->c);
+
+  int n = b->r, i, j;
+  for (i = n-1; i >= 0; --i) {
+    double s = 0.0;
+    for (j = i+1; j < n; ++j) {
+      s += A->t[i*n+j] * x->t[j];
+    }
+    x->t[i] = (b->t[i]-s)/A->t[i*n+i];
+  }
+
+  return x;
 }
 
