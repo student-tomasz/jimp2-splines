@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include "cli.h"
 #include "options.h"
-#include "io.h"
 #include "logger.h"
 
 int cli_parse(const int argc, const char **argv)
@@ -27,12 +26,14 @@ int cli_parse(const int argc, const char **argv)
     }
 
     if (!flag) {
+      log_error("unknown flag \'%s\'", arg);
       return 0;
     }
     else if (flag->args > 0) {
       if (i+1 < argc)
         options_set_with_arg(flag, argv[++i]);
       else {
+        log_error("flag \'%s\' needs an argument", arg);
         return 0;
       }
     }
@@ -42,10 +43,11 @@ int cli_parse(const int argc, const char **argv)
   }
 
   if (options->out_filename == NULL && options->in_filename == NULL) {
-    log_error("at least one filename (input or output) has to declared");
+    log_error("at least one filename (input or output) has to be declared");
     return 0;
   }
 
   log_info("parsed arguments from command line");
   return 1;
 }
+
