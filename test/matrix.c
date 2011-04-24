@@ -1,7 +1,7 @@
 #include <math.h>
 #include "minunit.h"
-#include "../epsilon.h"
-#include "../matrix.h"
+#include "../app/epsilon.h"
+#include "../app/matrix.h"
 
 static int matrix_is_equal(matrix_t *lh, matrix_t *rh) {
   if (lh->r != rh->r || lh->c != rh->c) {

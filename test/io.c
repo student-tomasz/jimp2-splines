@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include "minunit.h"
 #include "io.h"
-#include "../io.h"
-#include "../options.h"
-#include "../point.h"
-#include "../list.h"
-#include "../point_list.h"
-#include "../spline.h"
-#include "../polynomial.h"
+#include "../app/io.h"
+#include "../app/options.h"
+#include "../app/point.h"
+#include "../app/list.h"
+#include "../app/point_list.h"
+#include "../app/spline.h"
+#include "../app/polynomial.h"
 
 static int read_correct_file()
 {

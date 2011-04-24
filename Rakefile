@@ -1,12 +1,13 @@
-$build_dir = '../build/'
-$tests_dir = 'test/'
+$build_dir = 'build/'
+$test_dir  = 'test/'
+$src_dir   = 'app/'
 
-$cc = 'gcc'
+$cc = 'cc'
 $cf = '-Wall'
-$srcs = FileList['*.c']
-$objs = $srcs.map{ |s| s.sub('.c', '.o') }
+$src  = FileList[$src_dir + '*.c']
+$objs = $src.map{ |s| s.sub('.c', '.o') }
 $exec = 'splines'
-$test_srcs = FileList[$tests_dir + '*.c']
+$test_srcs = FileList[$test_dir + '*.c']
 $test_objs = $test_srcs.map{ |s| s.sub('.c', '.o') }
 $test_exec = 'test_splines'
 
@@ -17,18 +18,17 @@ end
 directory $build_dir
 
 file $exec => $objs do |t|
-  sh "#{$cc} #{$cf} #{t.prerequisites.join(' ')} -o #{t.name}"
+  sh "#{$cc} #{$cf} #{t.prerequisites.join(' ')} -o #{$build_dir + t.name}"
 end
 
-file $test_exec => ([$objs, $test_objs].flatten - ['main.o']) do |t|
-  sh "#{$cc} #{$cf} #{t.prerequisites.join(' ')} -o #{t.name}"
+file $test_exec => ([$objs, $test_objs].flatten - [$src_dir + 'main.o']) do |t|
+  sh "#{$cc} #{$cf} #{t.prerequisites.join(' ')} -o #{$build_dir + t.name}"
 end
 
 task :default => :build
 
 desc "Builds the project"
 task :build => [$build_dir, $exec] do |t|
-  mv $exec, $build_dir
 end
 
 desc "Removes all build products"
@@ -38,7 +38,6 @@ end
 
 desc "Run all tests"
 task :test => [$build_dir, $test_exec] do
-  mv $test_exec, $build_dir
   cd $build_dir
   sh "./#{$test_exec}"
 end
