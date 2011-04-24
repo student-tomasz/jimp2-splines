@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "io.h"
-#include "epsilon.h"
 #include "matrix.h"
+#include "epsilon.h"
+#include "io.h"
 
 static matrix_t *matrix_copy(const matrix_t *m);
 static int matrix_find_max_in_column(const matrix_t *A, int i);
