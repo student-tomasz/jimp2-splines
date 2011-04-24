@@ -31,24 +31,15 @@ list_t *io_read()
     return NULL;
   }
 
-  int points_array_size = 8;
-  int points_count = 0;
-  point_t **points_array = malloc(sizeof(*points_array) * points_array_size);
-
-  int read_sum = 0;
+  list_t *points = NULL;
+  double x, y;
   while (1) {
-    double x, y;
-    int read_count = fscanf(source, "%lg %lg", &x, &y);
-    if (read_count == 2) {
-      points_array[points_count++] = point_new(x, y);
-      if (points_count == points_array_size-1) {
-        points_array_size *= 2;
-        points_array = realloc(points_array, sizeof(*points_array) * points_array_size);
-      }
-      read_sum += 1;
+    int read = fscanf(source, "%lg %lg", &x, &y);
+    if (read == 2) {
+      points = point_list_add(points, x, y);
     }
-    else if (read_count == EOF) {
-      log_info("read %d points", read_sum);
+    else if (read == EOF) {
+      log_info("read %d points", list_length(points));
       break;
     }
     else {
@@ -58,15 +49,7 @@ list_t *io_read()
     }
   }
 
-  list_t *points = point_list_cleanup(points_array, points_count);
-
-  int i;
-  for (i = 0; i < points_count; ++i) {
-    point_free(points_array[i]);
-  }
-  free(points_array);
   if (source != stdin) fclose(source);
-
   return points;
 }
 

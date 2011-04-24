@@ -4,6 +4,7 @@
 #include "list.h"
 #include "io.h"
 #include "spline.h"
+#include "point_list.h"
 
 int main(int argc, const char **argv)
 {
@@ -28,6 +29,7 @@ int main(int argc, const char **argv)
   if(!io_gnuplot(nodes, splines)) {
     return EXIT_FAILURE;
   }
-
+ 
+  point_list_free(nodes);
   return EXIT_SUCCESS;
 }
