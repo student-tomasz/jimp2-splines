@@ -8,7 +8,6 @@
 int main(int argc, const char **argv)
 {
   if (!cli_parse(argc, argv)) {
-    fprintf(stderr, "[error] %s:%d:%s(): invalid command line arguments\n", __FILE__, __LINE__, __func__);
     return EXIT_FAILURE;
   }
 
