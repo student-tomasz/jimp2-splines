@@ -70,12 +70,12 @@ list_t *spline_interpolate(list_t *nodes)
   }
 
   /* guass that frickin' matrix */
-  io_log("gaussian elimination for A*k = b");
+  io_debug("gauss for matrices:");
   char *matrix_str = matrix_to_str(A);
-  io_log(matrix_str);
+  io_debug(matrix_str);
   free(matrix_str);
   matrix_str = matrix_to_str(b);
-  io_log(matrix_str);
+  io_debug(matrix_str);
   free(matrix_str);
 
   k = matrix_gauss(A, b);
@@ -97,7 +97,7 @@ list_t *spline_interpolate(list_t *nodes)
   free(y);
   free(x);
 
-  io_log("splines found");
+  io_info("splines found");
   return splines;
 }
 

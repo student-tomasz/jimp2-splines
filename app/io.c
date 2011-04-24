@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdarg.h>
 #include "io.h"
 #include "point.h"
 #include "list.h"
@@ -20,18 +21,15 @@ list_t *io_read()
   FILE *source = NULL;
   if (options->in_filename) {
     source = fopen(options->in_filename, "r");
-    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+strlen(options->in_filename)+1));
-    sprintf(msg, "reading data from file: %s", options->in_filename);
-    io_log(msg);
-    free(msg);
+    io_info("reading data from file: %s", options->in_filename);
   }
   else {
     source = stdin;
-    io_log("reading data from standard input");
+    io_info("reading data from standard input");
   }
 
   if (!source) {
-    io_error("couldn't read data");
+    io_error("input stream is invalid");
     return NULL;
   }
 
@@ -52,15 +50,12 @@ list_t *io_read()
       read_sum += 1;
     }
     else if (read_count == EOF) {
-      char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-      sprintf(msg, "read %d points", read_sum);
-      io_log(msg);
-      free(msg);
+      io_info("read %d points", read_sum);
       break;
     }
     else {
       if (source != stdin) fclose(source);
-      io_error("couldn't read from data file or data file is invalid");
+      io_error("input data is corrupted");
       return NULL;
     }
   }
@@ -91,11 +86,8 @@ int io_write(list_t *nodes, list_t *splines)
 
   FILE *output = fopen(output_filename, "r");
   if (output != NULL && options->force == 0) {
+    io_error("couldn't write output to %s", output_filename);
     free(output_filename);
-    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-    sprintf(msg, "couldn't write output to file: %s", output_filename);
-    io_error(msg);
-    free(msg);
     return 0;
   }
   fclose(output);
@@ -120,11 +112,7 @@ int io_write(list_t *nodes, list_t *splines)
     free(poly_str);
   }
 
-  char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-  sprintf(msg, "output written to file: %s", output_filename);
-  io_log(msg);
-  free(msg);
-
+  io_info("output written to %s", output_filename);
   fclose(output);
   free(output_filename);
   return 1;
@@ -144,11 +132,7 @@ int io_gnuplot(list_t *nodes, list_t *splines)
 
   FILE *gnuplot = fopen(gnuplot_filename, "w");
   if (!gnuplot) {
-    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-    sprintf(msg, "couldn't write gnuplot output to: %s", gnuplot_filename);
-    io_log(msg);
-    free(msg);
-
+    io_info("couldn't write gnuplot output to %s", gnuplot_filename);
     free(plot_filename);
     free(gnuplot_filename);
     return 0;
@@ -200,11 +184,7 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   }
   fprintf(gnuplot, "\te\n");
 
-  char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-  sprintf(msg, "gnuplot output written to file: %s", gnuplot_filename);
-  io_log(msg);
-  free(msg);
- 
+  io_info("gnuplot output written to %s", gnuplot_filename);
   fclose(gnuplot);
   free(plot_filename);
   free(gnuplot_filename);
@@ -213,29 +193,37 @@ int io_gnuplot(list_t *nodes, list_t *splines)
 
 
 
-void io_bare_log(const char *type, const char *msg)
+void io_log_impl(const char *file, const int line, const char *type, const char *msg, ...)
 {
-  if (options->quiet) {
-    return;
-  }
+  if (!options || options->quiet) return;
 
-  const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
-  char *log_filename = io_change_filename_extension(output_filename, ".log");
   static FILE *log = NULL;
-  if (!log) {
-    log = fopen(log_filename, "w");
+  if (!log && (options->in_filename || options->out_filename)) {
+    const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
+    char *log_filename = io_change_filename_extension(output_filename, ".log");
 
+    log = fopen(log_filename, "w");
     time_t rawtime;
     time(&rawtime);
     fprintf(log, "# created at: %s", ctime(&rawtime));
     fprintf(log, "#       file: %s\n", log_filename);
+
+    free(log_filename);
   }
 
-  fprintf(log, "[%5s] %s\n", type, msg);
+  const char log_fmt[] = "%s:%d: [%s] %s\n"; 
+  char *log_msg;
+  va_list ap;
+  va_start(ap, msg);
+  vasprintf(&log_msg, msg, ap);
+  va_end(ap);
+  
+  if (log)
+    fprintf(log, log_fmt, file, line, type, log_msg);
   if (strcmp(type, "error") == 0)
-    fprintf(stderr, "[%5s] %s\n", type, msg);
+    fprintf(stderr, log_fmt, file, line, type, log_msg);
 
-  free(log_filename);
+  free(log_msg);
 }
 
 

@@ -41,10 +41,10 @@ int cli_parse(const int argc, const char **argv)
   }
 
   if (options->out_filename == NULL && options->in_filename == NULL) {
-    fprintf(stderr, "[error] %s:%d:%s(): at least one filename (input or output) has to declared\n", __FILE__, __LINE__, __func__);
+    io_error("at least one filename (input or output) has to declared");
     return 0;
   }
 
-  io_log("parsed arguments from command line");
+  io_info("parsed arguments from command line");
   return 1;
 }
