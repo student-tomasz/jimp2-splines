@@ -9,10 +9,7 @@
 #include "point_list.h"
 #include "polynomial.h"
 #include "options.h"
-
-
-
-static char *io_change_filename_extension(const char *filename, const char *extension);
+#include "file_helpers.h"
 
 
 
@@ -78,10 +75,10 @@ int io_write(list_t *nodes, list_t *splines)
 {
   char *output_filename = NULL;
   if (options->out_filename) {
-    output_filename = io_change_filename_extension(options->out_filename, "");
+    output_filename = file_helpers_change_extension(options->out_filename, "");
   }
   else {
-    output_filename = io_change_filename_extension(options->in_filename, ".out");
+    output_filename = file_helpers_change_extension(options->in_filename, ".out");
   }
 
   FILE *output = fopen(output_filename, "r");
@@ -127,8 +124,8 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   }
 
   const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
-  char *gnuplot_filename = io_change_filename_extension(output_filename, ".plt");
-  char *plot_filename = io_change_filename_extension(output_filename, ".pdf");
+  char *gnuplot_filename = file_helpers_change_extension(output_filename, ".plt");
+  char *plot_filename = file_helpers_change_extension(output_filename, ".pdf");
 
   FILE *gnuplot = fopen(gnuplot_filename, "w");
   if (!gnuplot) {
@@ -200,7 +197,7 @@ void io_log_impl(const char *file, const int line, const char *type, const char 
   static FILE *log = NULL;
   if (!log && (options->in_filename || options->out_filename)) {
     const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
-    char *log_filename = io_change_filename_extension(output_filename, ".log");
+    char *log_filename = file_helpers_change_extension(output_filename, ".log");
 
     log = fopen(log_filename, "w");
     time_t rawtime;
@@ -224,24 +221,5 @@ void io_log_impl(const char *file, const int line, const char *type, const char 
     fprintf(stderr, log_fmt, file, line, type, log_msg);
 
   free(log_msg);
-}
-
-
-
-static char *io_change_filename_extension(const char *filename, const char *extension)
-{
-  char *new_filename = malloc(sizeof(*new_filename) * (strlen(filename)+strlen(extension)+2));
-  strcpy(new_filename, filename);
-
-  if (strlen(extension) == 0) {
-    return new_filename;
-  }
-
-  char *dot = strrchr(new_filename, '.');
-  if (dot)
-    strcpy(dot, extension);
-  else
-    strcat(new_filename, extension);
-  return new_filename;
 }
 
