@@ -6,6 +6,7 @@
 #include "epsilon.h"
 #include "matrix.h"
 
+static matrix_t *matrix_copy(const matrix_t *m);
 static int matrix_find_max_in_column(const matrix_t *A, int i);
 static void matrix_swap_rows(matrix_t *A, int lh, int rh);
 static void matrix_add_rows(matrix_t *A, int lh, double coeff, int rh);
@@ -29,6 +30,11 @@ matrix_t *matrix_new(const double *t, int r, int c)
   return m;
 }
 
+static matrix_t *matrix_copy(const matrix_t *m)
+{
+  return matrix_new(m->t, m->r, m->c);
+}
+
 void matrix_free(matrix_t *m)
 {
   if (m) {
@@ -37,34 +43,34 @@ void matrix_free(matrix_t *m)
   }
 }
 
-matrix_t *matrix_gauss(const matrix_t *A, const matrix_t *b)
+matrix_t *matrix_gauss(const matrix_t *_A, const matrix_t *_b)
 {
-  if (!matrix_is_square(A)) {
+  if (!matrix_is_square(_A)) {
     return NULL; // TODO: error
   }
-  matrix_t *Q = matrix_new(A->t, A->r, A->c);
-  matrix_t *r = matrix_new(b->t, b->r, b->c);
 
-  int n = Q->c;
-  int i, j;
+  matrix_t *A = matrix_copy(_A);
+  matrix_t *b = matrix_copy(_b);
+
+  int i, j, n = A->c;
   for (i = 0; i < n; ++i) {
-    int max_i = matrix_find_max_in_column(Q, i);
-    if (is_zero(Q->t[max_i*n+i])) {
+    int max_i = matrix_find_max_in_column(A, i);
+    if (is_zero(A->t[max_i*n+i])) {
       return NULL; // TODO: error
     }
-    matrix_swap_rows(Q, i, max_i);
-    matrix_swap_rows(r, i, max_i);
+    matrix_swap_rows(A, i, max_i);
+    matrix_swap_rows(b, i, max_i);
 
     for (j = i+1; j < n; ++j) {
-      double coeff = Q->t[j*n+i]/Q->t[i*n+i];
-      matrix_subtract_rows(Q, j, coeff, i);
-      matrix_subtract_rows(r, j, coeff, i);
+      double coeff = A->t[j*n+i]/A->t[i*n+i];
+      matrix_subtract_rows(A, j, coeff, i);
+      matrix_subtract_rows(b, j, coeff, i);
     }
   }
 
-  matrix_t *x = matrix_solve_upper_diagonal(Q, r);
-  matrix_free(r);
-  matrix_free(Q);
+  matrix_t *x = matrix_solve_upper_diagonal(A, b);
+  matrix_free(b);
+  matrix_free(A);
   return x;
 }
 
