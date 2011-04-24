@@ -1,14 +1,14 @@
 #include <string.h>
 #include "flag.h"
-#include "options.h"
 
-flag_t known_flags[] = {
-  {"out", 'o', 1},
-  {"in", 'i', 1},
+flag_t flags_all[] = {
+  {"out",     'o', 1},
+  {"in",      'i', 1},
   {"gnuplot", 'g', 0},
-  {"force", 'f', 0},
-  {"quiet", 'q', 0}
+  {"force",   'f', 0},
+  {"quiet",   'q', 0}
 };
+const int flags_all_count = sizeof(flags_all)/sizeof(flags_all[0]);
 
 int flag_is_long_flag(const char *arg)
 {
@@ -28,9 +28,9 @@ int flag_is_filename(const char *arg)
 flag_t *flag_find_by_name(const char *arg)
 {
   int i;
-  for (i = 0; i < sizeof(known_flags)/sizeof(known_flags[0]); ++i) {
-    if (strcmp(arg, known_flags[i].name) == 0) {
-      return known_flags+i;
+  for (i = 0; i < flags_all_count; ++i) {
+    if (strcmp(arg, flags_all[i].name) == 0) {
+      return flags_all+i;
     }
   }
   return NULL;
@@ -39,9 +39,9 @@ flag_t *flag_find_by_name(const char *arg)
 flag_t *flag_find(const char arg)
 {
   int i;
-  for (i = 0; i < sizeof(known_flags)/sizeof(known_flags[0]); ++i) {
-    if (arg == known_flags[i].flag) {
-      return known_flags+i;
+  for (i = 0; i < flags_all_count; ++i) {
+    if (arg == flags_all[i].flag) {
+      return flags_all+i;
     }
   }
   return NULL;
