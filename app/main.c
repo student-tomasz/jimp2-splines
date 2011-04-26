@@ -4,11 +4,11 @@
 #include "list.h"
 #include "io.h"
 #include "spline.h"
+#include "point_list.h"
 
 int main(int argc, const char **argv)
 {
   if (!cli_parse(argc, argv)) {
-    fprintf(stderr, "[error] %s:%d:%s(): invalid command line arguments\n", __FILE__, __LINE__, __func__);
     return EXIT_FAILURE;
   }
 
@@ -29,6 +29,7 @@ int main(int argc, const char **argv)
   if(!io_gnuplot(nodes, splines)) {
     return EXIT_FAILURE;
   }
-
+ 
+  point_list_free(nodes);
   return EXIT_SUCCESS;
 }

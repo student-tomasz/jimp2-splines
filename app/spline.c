@@ -5,7 +5,7 @@
 #include "polynomial.h"
 #include "matrix.h"
 #include "spline.h"
-#include "io.h"
+#include "logger.h"
 
 list_t *spline_interpolate(list_t *nodes)
 {
@@ -69,18 +69,18 @@ list_t *spline_interpolate(list_t *nodes)
     b->t[last_row] = 0;
   }
 
-  /* guass that frickin' matrix */
-  io_log("gaussian elimination for A*k = b");
-  char *matrix_str = matrix_to_str(A);
-  io_log(matrix_str);
-  free(matrix_str);
-  matrix_str = matrix_to_str(b);
-  io_log(matrix_str);
-  free(matrix_str);
+  /* log_debug("gauss for matrices:");*/
+  /* char *matrix_str = matrix_to_str(A);*/
+  /* log_debug(matrix_str);*/
+  /* free(matrix_str);*/
+  /* matrix_str = matrix_to_str(b);*/
+  /* log_debug(matrix_str);*/
+  /* free(matrix_str);*/
 
+  /* guass that frickin' matrix */
   k = matrix_gauss(A, b);
   if (!k) {
-    io_error("gauss couldn't find splines");
+    log_error("gauss couldn't find splines");
     return NULL;
   }
 
@@ -97,7 +97,7 @@ list_t *spline_interpolate(list_t *nodes)
   free(y);
   free(x);
 
-  io_log("splines found");
+  log_info("splines found");
   return splines;
 }
 

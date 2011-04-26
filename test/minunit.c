@@ -3,7 +3,7 @@
 #include "spline.h"
 #include "io.h"
 #include "cli.h"
-#include "../options.h"
+#include "../app/options.h"
 
 int tests_run = 0;
 

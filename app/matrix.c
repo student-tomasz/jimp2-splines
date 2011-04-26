@@ -2,15 +2,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "io.h"
-#include "epsilon.h"
 #include "matrix.h"
+#include "epsilon.h"
+#include "logger.h"
 
+static matrix_t *matrix_copy(const matrix_t *m);
 static int matrix_find_max_in_column(const matrix_t *A, int i);
 static void matrix_swap_rows(matrix_t *A, int lh, int rh);
 static void matrix_add_rows(matrix_t *A, int lh, double coeff, int rh);
 static void matrix_subtract_rows(matrix_t *A, int lh, double coeff, int rh);
 static int matrix_is_square(const matrix_t *A);
+static matrix_t *matrix_solve_upper_diagonal(const matrix_t *A, const matrix_t *b);
 
 matrix_t *matrix_new(const double *t, int r, int c)
 {
@@ -28,6 +30,11 @@ matrix_t *matrix_new(const double *t, int r, int c)
   return m;
 }
 
+static matrix_t *matrix_copy(const matrix_t *m)
+{
+  return matrix_new(m->t, m->r, m->c);
+}
+
 void matrix_free(matrix_t *m)
 {
   if (m) {
@@ -36,72 +43,55 @@ void matrix_free(matrix_t *m)
   }
 }
 
-matrix_t *matrix_gauss(const matrix_t *A, const matrix_t *b)
+matrix_t *matrix_gauss(const matrix_t *_A, const matrix_t *_b)
 {
-  if (!matrix_is_square(A)) {
-    return NULL; // TODO: error
+  if (!matrix_is_square(_A)) {
+    log_error("matrix isn't square");
+    return NULL;
   }
-  matrix_t *Q = matrix_new(A->t, A->r, A->c);
-  matrix_t *x = matrix_new(NULL, b->r, b->c);
-  matrix_t *r = matrix_new(b->t, b->r, b->c);
 
-  int n = Q->c;
-  int i, j;
+  matrix_t *A = matrix_copy(_A);
+  matrix_t *b = matrix_copy(_b);
+
+  int i, j, n = A->c;
   for (i = 0; i < n; ++i) {
-    int max_i = matrix_find_max_in_column(Q, i);
-    if (is_zero(Q->t[max_i*n+i])) {
-      return NULL; // TODO: error
+    int max_i = matrix_find_max_in_column(A, i);
+    if (is_zero(A->t[max_i*n+i])) {
+      log_error("matrix has an empty column, which gives more than one solution");
+      return NULL;
     }
-    matrix_swap_rows(Q, i, max_i);
-    matrix_swap_rows(r, i, max_i);
+    matrix_swap_rows(A, i, max_i);
+    matrix_swap_rows(b, i, max_i);
 
     for (j = i+1; j < n; ++j) {
-      double coeff = Q->t[j*n+i]/Q->t[i*n+i];
-      matrix_subtract_rows(Q, j, coeff, i);
-      matrix_subtract_rows(r, j, coeff, i);
+      double coeff = A->t[j*n+i]/A->t[i*n+i];
+      matrix_subtract_rows(A, j, coeff, i);
+      matrix_subtract_rows(b, j, coeff, i);
     }
   }
 
-  for (i = n-1; i >= 0; --i) {
-    double s = 0.0;
-    for (j = i+1; j < n; ++j) {
-      s += Q->t[i*n+j] * x->t[j];
-    }
-    x->t[i] = (r->t[i]-s)/Q->t[i*n+i];
-  }
-
-  matrix_free(r);
-  matrix_free(Q);
+  matrix_t *x = matrix_solve_upper_diagonal(A, b);
+  matrix_free(b);
+  matrix_free(A);
   return x;
 }
 
 char *matrix_to_str(const matrix_t *m)
 {
-  char *str = malloc(sizeof(*str) * (MAX_STR_LENGTH * 10 + 1));
-  str[0] = '\0';
-  char *tmp = malloc(sizeof(*tmp) * (MAX_STR_LENGTH + 1));
+  char *str = NULL;
 
-  sprintf(tmp, "[");
-  strcat(str, tmp);
+  asprintf(&str, "\n[");
   int i, j;
   for (i = 0; i < m->r; ++i) {
-    sprintf(tmp, "[");
-    strcat(str, tmp);
+    asprintf(&str, "%s[", str);
     for (j = 0; j < m->c; ++j) {
       double v = m->t[i*m->c+j];
-      if (j != m->c-1)
-        sprintf(tmp, "%g, ", v);
-      else
-        sprintf(tmp, "%g", v);
-      strcat(str, tmp);
+      asprintf(&str, "%s%g%s", str, v, j == m->c-1 ? "" : ", ");
     }
-    sprintf(tmp, "]%s", i == m->r-1 ? "" : ",\n");
-    strcat(str, tmp);
+    asprintf(&str, "%s]%s", str, i == m->r-1 ? "" : ",\n");
   }
-  sprintf(tmp, "]\n");
-  strcat(str, tmp);
+  asprintf(&str, "%s]\n", str);
 
-  free(tmp);
   return str;
 }
 
@@ -150,5 +140,21 @@ static void matrix_subtract_rows(matrix_t *A, int lh, double coeff, int rh)
 static int matrix_is_square(const matrix_t *A)
 {
   return (A->r == A->c) && (A->c > 0);
+}
+
+static matrix_t *matrix_solve_upper_diagonal(const matrix_t *A, const matrix_t *b)
+{
+  matrix_t *x = matrix_new(NULL, b->r, b->c);
+
+  int n = b->r, i, j;
+  for (i = n-1; i >= 0; --i) {
+    double s = 0.0;
+    for (j = i+1; j < n; ++j) {
+      s += A->t[i*n+j] * x->t[j];
+    }
+    x->t[i] = (b->t[i]-s)/A->t[i*n+i];
+  }
+
+  return x;
 }
 

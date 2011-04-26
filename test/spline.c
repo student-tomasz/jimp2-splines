@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include "minunit.h"
 #include "spline.h"
-#include "../list.h"
-#include "../point.h"
-#include "../spline.h"
-#include "../options.h"
+#include "../app/list.h"
+#include "../app/point.h"
+#include "../app/spline.h"
+#include "../app/options.h"
+#include "../app/polynomial.h"
 
 static int basic_spline()
 {

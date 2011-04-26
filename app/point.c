@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "io.h"
-#include "epsilon.h"
 #include "point.h"
+#include "epsilon.h"
 
 point_t *point_new(double x, double y)
 {
@@ -21,8 +20,8 @@ void point_free(point_t *p)
 
 char *point_to_str(point_t *p)
 {
-  char *str = malloc(sizeof(*str) * (MAX_STR_LENGTH + 1));
-  sprintf(str, "%lg %lg", p->x, p->y);
+  char *str = NULL;
+  asprintf(&str, "%lg %lg", p->x, p->y);
   return str;
 }
 

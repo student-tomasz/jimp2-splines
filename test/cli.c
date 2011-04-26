@@ -3,9 +3,9 @@
 #include <string.h>
 #include "minunit.h"
 #include "cli.h"
-#include "../cli.h"
-#include "../options.h"
-#include "../flag.h"
+#include "../app/cli.h"
+#include "../app/options.h"
+#include "../app/flag.h"
 
 static int empty_flags()
 {

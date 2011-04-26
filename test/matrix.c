@@ -1,7 +1,7 @@
 #include <math.h>
 #include "minunit.h"
-#include "../epsilon.h"
-#include "../matrix.h"
+#include "../app/epsilon.h"
+#include "../app/matrix.h"
 
 static int matrix_is_equal(matrix_t *lh, matrix_t *rh) {
   if (lh->r != rh->r || lh->c != rh->c) {
@@ -26,7 +26,10 @@ static int gauss_with_no_gotchas()
   double tx[] = {3, -2};
   matrix_t *should_be_x = matrix_new(tx, 2, 1);
 
+  printf("matrix A: %s\n", matrix_to_str(A));
+  printf("matrix b: %s\n", matrix_to_str(b));
   matrix_t *x = matrix_gauss(A, b);
+  printf("matrix x: %s\n", matrix_to_str(x));
   mu_assert(matrix_is_equal(x, should_be_x));
 }
 

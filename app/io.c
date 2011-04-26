@@ -2,16 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdarg.h>
 #include "io.h"
+#include "logger.h"
 #include "point.h"
 #include "list.h"
 #include "point_list.h"
 #include "polynomial.h"
 #include "options.h"
-
-
-
-static char *io_change_filename_extension(const char *filename, const char *extension);
+#include "file_helpers.h"
 
 
 
@@ -20,60 +19,37 @@ list_t *io_read()
   FILE *source = NULL;
   if (options->in_filename) {
     source = fopen(options->in_filename, "r");
-    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+strlen(options->in_filename)+1));
-    sprintf(msg, "reading data from file: %s", options->in_filename);
-    io_log(msg);
-    free(msg);
+    log_info("reading data from file: %s", options->in_filename);
   }
   else {
     source = stdin;
-    io_log("reading data from standard input");
+    log_info("reading data from standard input");
   }
 
   if (!source) {
-    io_error("couldn't read data");
+    log_error("input stream is invalid");
     return NULL;
   }
 
-  int points_array_size = 8;
-  int points_count = 0;
-  point_t **points_array = malloc(sizeof(*points_array) * points_array_size);
-
-  int read_sum = 0;
+  list_t *points = NULL;
+  double x, y;
   while (1) {
-    double x, y;
-    int read_count = fscanf(source, "%lg %lg", &x, &y);
-    if (read_count == 2) {
-      points_array[points_count++] = point_new(x, y);
-      if (points_count == points_array_size-1) {
-        points_array_size *= 2;
-        points_array = realloc(points_array, sizeof(*points_array) * points_array_size);
-      }
-      read_sum += 1;
+    int read = fscanf(source, "%lg %lg", &x, &y);
+    if (read == 2) {
+      points = point_list_add(points, x, y);
     }
-    else if (read_count == EOF) {
-      char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-      sprintf(msg, "read %d points", read_sum);
-      io_log(msg);
-      free(msg);
+    else if (read == EOF) {
+      log_info("read %d points", list_length(points));
       break;
     }
     else {
       if (source != stdin) fclose(source);
-      io_error("couldn't read from data file or data file is invalid");
+      log_error("input data is corrupted");
       return NULL;
     }
   }
 
-  list_t *points = point_list_cleanup(points_array, points_count);
-
-  int i;
-  for (i = 0; i < points_count; ++i) {
-    point_free(points_array[i]);
-  }
-  free(points_array);
   if (source != stdin) fclose(source);
-
   return points;
 }
 
@@ -83,19 +59,16 @@ int io_write(list_t *nodes, list_t *splines)
 {
   char *output_filename = NULL;
   if (options->out_filename) {
-    output_filename = io_change_filename_extension(options->out_filename, "");
+    output_filename = file_helpers_change_extension(options->out_filename, "");
   }
   else {
-    output_filename = io_change_filename_extension(options->in_filename, ".out");
+    output_filename = file_helpers_change_extension(options->in_filename, ".out");
   }
 
   FILE *output = fopen(output_filename, "r");
   if (output != NULL && options->force == 0) {
+    log_error("couldn't write output to %s", output_filename);
     free(output_filename);
-    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-    sprintf(msg, "couldn't write output to file: %s", output_filename);
-    io_error(msg);
-    free(msg);
     return 0;
   }
   fclose(output);
@@ -120,11 +93,7 @@ int io_write(list_t *nodes, list_t *splines)
     free(poly_str);
   }
 
-  char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-  sprintf(msg, "output written to file: %s", output_filename);
-  io_log(msg);
-  free(msg);
-
+  log_info("output written to %s", output_filename);
   fclose(output);
   free(output_filename);
   return 1;
@@ -139,16 +108,12 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   }
 
   const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
-  char *gnuplot_filename = io_change_filename_extension(output_filename, ".plt");
-  char *plot_filename = io_change_filename_extension(output_filename, ".pdf");
+  char *gnuplot_filename = file_helpers_change_extension(output_filename, ".plt");
+  char *plot_filename = file_helpers_change_extension(output_filename, ".pdf");
 
   FILE *gnuplot = fopen(gnuplot_filename, "w");
   if (!gnuplot) {
-    char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-    sprintf(msg, "couldn't write gnuplot output to: %s", gnuplot_filename);
-    io_log(msg);
-    free(msg);
-
+    log_info("couldn't write gnuplot output to %s", gnuplot_filename);
     free(plot_filename);
     free(gnuplot_filename);
     return 0;
@@ -200,60 +165,10 @@ int io_gnuplot(list_t *nodes, list_t *splines)
   }
   fprintf(gnuplot, "\te\n");
 
-  char *msg = malloc(sizeof(*msg) * (MAX_STR_LENGTH+1));
-  sprintf(msg, "gnuplot output written to file: %s", gnuplot_filename);
-  io_log(msg);
-  free(msg);
- 
+  log_info("gnuplot output written to %s", gnuplot_filename);
   fclose(gnuplot);
   free(plot_filename);
   free(gnuplot_filename);
   return 1;
-}
-
-
-
-void io_bare_log(const char *type, const char *msg)
-{
-  if (options->quiet) {
-    return;
-  }
-
-  const char *output_filename = options->out_filename ? options->out_filename : options->in_filename;
-  char *log_filename = io_change_filename_extension(output_filename, ".log");
-  static FILE *log = NULL;
-  if (!log) {
-    log = fopen(log_filename, "w");
-
-    time_t rawtime;
-    time(&rawtime);
-    fprintf(log, "# created at: %s", ctime(&rawtime));
-    fprintf(log, "#       file: %s\n", log_filename);
-  }
-
-  fprintf(log, "[%5s] %s\n", type, msg);
-  if (strcmp(type, "error") == 0)
-    fprintf(stderr, "[%5s] %s\n", type, msg);
-
-  free(log_filename);
-}
-
-
-
-static char *io_change_filename_extension(const char *filename, const char *extension)
-{
-  char *new_filename = malloc(sizeof(*new_filename) * (strlen(filename)+strlen(extension)+2));
-  strcpy(new_filename, filename);
-
-  if (strlen(extension) == 0) {
-    return new_filename;
-  }
-
-  char *dot = strrchr(new_filename, '.');
-  if (dot)
-    strcpy(dot, extension);
-  else
-    strcat(new_filename, extension);
-  return new_filename;
 }
 
