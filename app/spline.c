@@ -69,15 +69,15 @@ list_t *spline_interpolate(list_t *nodes)
     b->t[last_row] = 0;
   }
 
-  /* guass that frickin' matrix */
-  log_debug("gauss for matrices:");
-  char *matrix_str = matrix_to_str(A);
-  log_debug(matrix_str);
-  free(matrix_str);
-  matrix_str = matrix_to_str(b);
-  log_debug(matrix_str);
-  free(matrix_str);
+  /* log_debug("gauss for matrices:");*/
+  /* char *matrix_str = matrix_to_str(A);*/
+  /* log_debug(matrix_str);*/
+  /* free(matrix_str);*/
+  /* matrix_str = matrix_to_str(b);*/
+  /* log_debug(matrix_str);*/
+  /* free(matrix_str);*/
 
+  /* guass that frickin' matrix */
   k = matrix_gauss(A, b);
   if (!k) {
     log_error("gauss couldn't find splines");
