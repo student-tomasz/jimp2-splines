@@ -4,7 +4,6 @@
 #include <math.h>
 #include "matrix.h"
 #include "epsilon.h"
-#include "io.h"
 #include "logger.h"
 
 static matrix_t *matrix_copy(const matrix_t *m);
@@ -79,31 +78,20 @@ matrix_t *matrix_gauss(const matrix_t *_A, const matrix_t *_b)
 
 char *matrix_to_str(const matrix_t *m)
 {
-  char *str = malloc(sizeof(*str) * (MAX_STR_LENGTH * 10 + 1));
-  str[0] = '\0';
-  char *tmp = malloc(sizeof(*tmp) * (MAX_STR_LENGTH + 1));
+  char *str = NULL;
 
-  sprintf(tmp, "[");
-  strcat(str, tmp);
+  asprintf(&str, "\n[");
   int i, j;
   for (i = 0; i < m->r; ++i) {
-    sprintf(tmp, "[");
-    strcat(str, tmp);
+    asprintf(&str, "%s[", str);
     for (j = 0; j < m->c; ++j) {
       double v = m->t[i*m->c+j];
-      if (j != m->c-1)
-        sprintf(tmp, "%g, ", v);
-      else
-        sprintf(tmp, "%g", v);
-      strcat(str, tmp);
+      asprintf(&str, "%s%g%s", str, v, j == m->c-1 ? "" : ", ");
     }
-    sprintf(tmp, "]%s", i == m->r-1 ? "" : ",\n");
-    strcat(str, tmp);
+    asprintf(&str, "%s]%s", str, i == m->r-1 ? "" : ",\n");
   }
-  sprintf(tmp, "]\n");
-  strcat(str, tmp);
+  asprintf(&str, "%s]\n", str);
 
-  free(tmp);
   return str;
 }
 
