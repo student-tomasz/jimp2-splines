@@ -32,6 +32,9 @@ static int read_correct_file()
   if (!nodes) {
     mu_assert(0);
   }
+  char *pl_str = point_list_to_str(nodes);
+  printf("read_correct_file points:\n%s\n", pl_str);
+  free(pl_str);
   for (node = nodes, i = 0; i < m+1; node = node->next, ++i) {
     if (!point_is_equal((point_t *)node->data, should_be_nodes[i]))
       mu_assert(0);

@@ -5,7 +5,6 @@
 #include "list.h"
 #include "point.h"
 #include "epsilon.h"
-#include "io.h"
 
 static int point_list_compare(const list_t *lp, const list_t *rp);
 
@@ -51,7 +50,9 @@ char *point_list_to_str(const list_t *head)
   char *str = "";
   const list_t *node;
   for (node = head; node; node = node->next) {
-    asprintf(&str, "%s%g,%g ", str, ((point_t *)node->data)->x, ((point_t *)node->data)->y);
+    char *p_str = point_to_str((point_t *)node->data);
+    asprintf(&str, "%s%s\n", str, p_str);
+    free(p_str);
   }
   return str;
 }
