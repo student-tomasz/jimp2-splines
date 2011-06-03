@@ -27,8 +27,10 @@ list_t *point_list_add(list_t *head, double x, double y)
       return head;
     else if (cmp == -1) {
       new_node->next = node;
-      if (prev) prev->next = new_node;
-      return head;
+      if (!prev) {
+        return new_node;
+      }
+      break;
     }
   }
   prev->next = new_node;

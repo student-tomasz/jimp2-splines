@@ -43,6 +43,44 @@ static int read_correct_file()
   mu_assert(1);
 }
 
+static int read_correct_file_with_unsorted_points()
+{
+  const char *file = "correct_file.dat";
+  FILE *source = fopen(file, "w");
+  int i, m = 5;
+  point_t **should_be_nodes = malloc(sizeof(*should_be_nodes) * (m+1));
+  should_be_nodes[0] = point_new(3.14, 3.5);
+  should_be_nodes[1] = point_new(1.05, 2);
+  should_be_nodes[2] = point_new(-1, 4);
+  should_be_nodes[3] = point_new(9, -8);
+  should_be_nodes[4] = point_new(-5.76, 2);
+  should_be_nodes[5] = point_new(5, 3.7);
+  for (i = 0; i < m+1; ++i) {
+    fprintf(source, "%lg %lg\n", should_be_nodes[i]->x, should_be_nodes[i]->y);
+  }
+  fclose(source);
+
+  int correct_order[] = { 4, 2, 1, 0, 5, 3 };
+
+  options_init();
+  options->in_filename = file;
+  
+  list_t *nodes = io_read();
+  list_t *node;
+  if (!nodes) {
+    mu_assert(0);
+  }
+  char *pl_str = point_list_to_str(nodes);
+  printf("read_correct_file_with_unsorted_points points:\n%s\n", pl_str);
+  free(pl_str);
+  for (node = nodes, i = 0; i < m+1; node = node->next, ++i) {
+    if (!point_is_equal((point_t *)node->data, should_be_nodes[correct_order[i]]))
+      mu_assert(0);
+  }
+
+  mu_assert(1);
+}
+
 static int read_correct_file_with_poor_formating()
 {
   const char *file = "correct_file_with_poor_formating.dat";
@@ -148,6 +186,7 @@ int all_io_tests()
     read_correct_file,
     read_correct_file_with_poor_formating,
     read_correct_file_with_poor_formating_and_duplicate_points,
+    read_correct_file_with_unsorted_points,
     write_correct_file
   };
 
